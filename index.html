@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ali Tours & Travels &amp; Travels Website</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+      /* Google Maps Commutes Widget Styles */
+      .commutes {
+        align-content: stretch;
+        color: #202124;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        font-family: Arial, sans-serif;
+        height: 100%;
+        min-height: 256px;
+        min-width: 360px;
+        overflow: auto;
+        width: 100%;
+      }
+
+      .commutes-map {
+        flex: 1;
+        overflow: hidden;
+        position: relative;
+        width: 100%;
+      }
+
+      .map-view {
+        background-color: rgb(229, 227, 223);
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+      }
+
+      .commutes-info {
+        flex: 0 0 110px;
+        max-width: 100%;
+        overflow: hidden;
+      }
+
+      .commutes-initial-state {
+        border-radius: 8px;
+        border: 1px solid #dadce0;
+        display: flex;
+        height: 98px;
+        margin-top: 8px;
+        padding: 0 16px;
+        align-items: center;
+      }
+
+      .commutes-destinations {
+        display: none;
+        position: relative;
+        width: 100%;
+      }
+
+      .destinations-container {
+        display: flex;
+        overflow-x: auto;
+        padding: 8px;
+        white-space: nowrap;
+        width: 100%;
+      }
+
+      .destination-list {
+        display: flex;
+        flex-grow: 1;
+      }
+
+      .commutes-modal-container {
+        align-items: center;
+        background-color: rgba(0, 0, 0, 0.4);
+        display: none;
+        height: 100%;
+        justify-content: center;
+        left: 0;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 1000;
+      }
+
+      .travel-modes input[type=radio]:checked + label {
+        background: #e8f0fe;
+        border-color: #1967d2;
+        color: #1967d2;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script src="//code.tidio.co/xje5wl3o0gftc5bglz7fr3hd3zcfhl4p.js" async></script>
+  </body>
+</html>

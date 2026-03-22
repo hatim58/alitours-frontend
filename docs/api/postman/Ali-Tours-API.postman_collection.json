@@ -1,0 +1,678 @@
+{
+  "info": {
+    "name": "Ali Tours & Travels API",
+    "description": "Complete API collection for Ali Tours & Travels travel management system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://api.alitourstravels.in/v1",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"info@alitourstravels.in\",\n  \"password\": \"Yaalimadad@53\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": [
+            {
+              "name": "Successful Login",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "login"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"user\": {\n      \"id\": \"user_123\",\n      \"name\": \"John Doe\",\n      \"email\": \"user@example.com\",\n      \"role\": \"user\"\n    }\n  }\n}"
+            }
+          ],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.success && response.data.token) {",
+                  "        pm.collectionVariables.set('authToken', response.data.token);",
+                  "        pm.test('Login successful', () => {",
+                  "            pm.expect(response.success).to.be.true;",
+                  "        });",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\",\n  \"phone\": \"+91 9876543210\",\n  \"address\": \"123 Test Street, Test City\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tour Packages",
+      "item": [
+        {
+          "name": "Get All Packages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/packages?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["packages"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "destination",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "duration",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has packages array', () => {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    pm.expect(response.data.packages).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Package by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/packages/shimla-explorer",
+              "host": ["{{baseUrl}}"],
+              "path": ["packages", "shimla-explorer"]
+            }
+          }
+        },
+        {
+          "name": "Create Package (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Package\",\n  \"destination\": \"Test Destination\",\n  \"description\": \"A test package for API documentation purposes. This package includes all the basic features and amenities.\",\n  \"duration\": 5,\n  \"price\": 25000,\n  \"originalPrice\": 30000,\n  \"maxGuests\": 10,\n  \"image\": \"https://images.pexels.com/photos/2440024/pexels-photo-2440024.jpeg\",\n  \"highlights\": [\n    \"Test highlight 1\",\n    \"Test highlight 2\"\n  ],\n  \"includes\": [\n    \"Test inclusion 1\",\n    \"Test inclusion 2\"\n  ],\n  \"excludes\": [\n    \"Test exclusion 1\",\n    \"Test exclusion 2\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/packages",
+              "host": ["{{baseUrl}}"],
+              "path": ["packages"]
+            }
+          }
+        },
+        {
+          "name": "Search Packages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/packages/search?q=shimla&destination=Himachal",
+              "host": ["{{baseUrl}}"],
+              "path": ["packages", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "shimla"
+                },
+                {
+                  "key": "destination",
+                  "value": "Himachal"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Get My Bookings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings"]
+            }
+          }
+        },
+        {
+          "name": "Create Booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"packageId\": \"shimla-explorer\",\n  \"travelDate\": \"2024-06-15\",\n  \"guests\": 2,\n  \"specialRequests\": \"Vegetarian meals preferred\",\n  \"contactInfo\": {\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+91 9876543210\"\n  },\n  \"passengers\": [\n    {\n      \"name\": \"John Doe\",\n      \"age\": 35,\n      \"gender\": \"male\",\n      \"idType\": \"passport\",\n      \"idNumber\": \"A1234567\"\n    },\n    {\n      \"name\": \"Jane Doe\",\n      \"age\": 32,\n      \"gender\": \"female\",\n      \"idType\": \"passport\",\n      \"idNumber\": \"B7654321\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings"]
+            }
+          }
+        },
+        {
+          "name": "Get Booking Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/bookings/BK1001",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings", "BK1001"]
+            }
+          }
+        },
+        {
+          "name": "Cancel Booking",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Change in travel plans\",\n  \"refundRequested\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bookings/BK1001/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings", "BK1001", "cancel"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Bookings",
+      "item": [
+        {
+          "name": "Get All Bookings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/bookings?status=pending",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "bookings"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Booking Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"confirmed\",\n  \"note\": \"Payment verified and booking confirmed\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bookings/BK1001/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings", "BK1001", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customers (Admin)",
+      "item": [
+        {
+          "name": "Get All Customers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/customers",
+              "host": ["{{baseUrl}}"],
+              "path": ["customers"]
+            }
+          }
+        },
+        {
+          "name": "Create Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Smith\",\n  \"email\": \"jane@example.com\",\n  \"phone\": \"+91 9876543211\",\n  \"address\": \"456 Oak Street, City\",\n  \"gstNumber\": \"22BBBBB0000B1Z5\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/customers",
+              "host": ["{{baseUrl}}"],
+              "path": ["customers"]
+            }
+          }
+        },
+        {
+          "name": "Get Customer by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/customers/CUST001",
+              "host": ["{{baseUrl}}"],
+              "path": ["customers", "CUST001"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Quotations (Admin)",
+      "item": [
+        {
+          "name": "Get All Quotations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/quotations",
+              "host": ["{{baseUrl}}"],
+              "path": ["quotations"]
+            }
+          }
+        },
+        {
+          "name": "Create Quotation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"CUST001\",\n  \"validUntil\": \"2024-06-15\",\n  \"items\": [\n    {\n      \"description\": \"Shimla Package (5 Days)\",\n      \"quantity\": 2,\n      \"unitPrice\": 25000,\n      \"amount\": 50000,\n      \"notes\": \"Including breakfast\"\n    }\n  ],\n  \"terms\": \"50% advance payment required to confirm booking...\",\n  \"notes\": \"Special discount applied\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/quotations",
+              "host": ["{{baseUrl}}"],
+              "path": ["quotations"]
+            }
+          }
+        },
+        {
+          "name": "Update Quotation Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"accepted\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/quotations/QT001/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["quotations", "QT001", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invoices",
+      "item": [
+        {
+          "name": "Get My Invoices",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/invoices",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoices"]
+            }
+          }
+        },
+        {
+          "name": "Download Invoice PDF",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/invoices/INV001/download",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoices", "INV001", "download"]
+            }
+          }
+        },
+        {
+          "name": "Get All Invoices (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/invoices",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "invoices"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Get Package Reviews",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/packages/shimla-explorer/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["packages", "shimla-explorer", "reviews"]
+            }
+          }
+        },
+        {
+          "name": "Submit Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"packageId\": \"shimla-explorer\",\n  \"rating\": 5,\n  \"title\": \"Amazing Experience!\",\n  \"comment\": \"Had a wonderful time in Shimla. The itinerary was perfect and the guide was very knowledgeable.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews"]
+            }
+          }
+        },
+        {
+          "name": "Get All Reviews (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/reviews?status=pending",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "reviews"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Review Status (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"approved\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reviews/REV001/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews", "REV001", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Slideshow (Admin)",
+      "item": [
+        {
+          "name": "Get Active Slides",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/slideshow",
+              "host": ["{{baseUrl}}"],
+              "path": ["slideshow"]
+            }
+          }
+        },
+        {
+          "name": "Get All Slides (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/slideshow",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "slideshow"]
+            }
+          }
+        },
+        {
+          "name": "Create Slide",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"New Slide Title\",\n  \"subtitle\": \"Slide Subtitle\",\n  \"description\": \"Slide description text\",\n  \"image\": \"https://images.pexels.com/photos/1174732/pexels-photo-1174732.jpeg\",\n  \"buttonText\": \"Learn More\",\n  \"buttonLink\": \"/packages\",\n  \"type\": \"package\",\n  \"isActive\": true,\n  \"order\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/slideshow",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "slideshow"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Set timestamp for requests",
+          "pm.globals.set('timestamp', new Date().toISOString());"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test for response time",
+          "pm.test('Response time is less than 2000ms', () => {",
+          "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+          "});",
+          "",
+          "// Global test for content type",
+          "if (pm.response.code !== 204) {",
+          "    pm.test('Content-Type is application/json', () => {",
+          "        pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+          "    });",
+          "}"
+        ]
+      }
+    }
+  ]
+}
