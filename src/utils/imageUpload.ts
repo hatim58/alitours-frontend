@@ -74,13 +74,12 @@ export const handleImageUpload = async (file: File): Promise<{ success: boolean;
 
     // Compress image
     const compressedImage = await compressImage(file);
-    
+
     // In a real application, you would upload to a cloud service like:
     // - Cloudinary
     // - AWS S3
     // - Google Cloud Storage
-    // - Supabase Storage
-    
+
     // For now, we'll use the compressed data URL
     return { success: true, data: compressedImage };
   } catch (error) {

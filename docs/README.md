@@ -69,9 +69,6 @@ Welcome to the comprehensive documentation for Ali Tours & Travels travel manage
 Create a `.env` file in the root directory:
 
 ```env
-# Supabase Configuration
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 # Payment Gateway
 VITE_RAZORPAY_KEY_ID=your_razorpay_key
@@ -83,14 +80,10 @@ VITE_API_BASE_URL=http://localhost:3000/api/v1
 
 ### Database Setup
 
-1. **Connect to Supabase**
-   - Click "Connect to Supabase" in the top right
-   - Follow the setup wizard
 
 2. **Run Migrations**
    ```bash
    # Migrations are automatically applied
-   # Check supabase/migrations/ for SQL files
    ```
 
 ### Development Commands
@@ -230,8 +223,6 @@ npm run build
 
 **Production Environment Variables:**
 ```env
-VITE_SUPABASE_URL=your_production_supabase_url
-VITE_SUPABASE_ANON_KEY=your_production_supabase_key
 VITE_RAZORPAY_KEY_ID=your_production_razorpay_key
 VITE_API_BASE_URL=https://api.alitourstravels.in/v1
 ```

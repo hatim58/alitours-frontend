@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Mail, AlertCircle, CheckCircle } from 'lucide-react';
-import { supabase } from '../utils/supabaseClient';
 
 type Step = 'request' | 'reset';
 
@@ -19,21 +18,6 @@ const PasswordReset: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/password-reset`,
-      });
-
-      if (error) throw error;
-
-      setSuccess(true);
-      setTimeout(() => navigate('/login'), 3000);
-    } catch (err: any) {
-      setError(err.message || 'Failed to send reset email');
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const handleResetPassword = async (e: React.FormEvent) => {
@@ -51,21 +35,6 @@ const PasswordReset: React.FC = () => {
     }
 
     setIsLoading(true);
-
-    try {
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword,
-      });
-
-      if (error) throw error;
-
-      setSuccess(true);
-      setTimeout(() => navigate('/login'), 3000);
-    } catch (err: any) {
-      setError(err.message || 'Failed to reset password');
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   if (success) {
@@ -175,8 +144,8 @@ const PasswordReset: React.FC = () => {
             {isLoading
               ? 'Processing...'
               : step === 'request'
-              ? 'Send Reset Email'
-              : 'Reset Password'}
+                ? 'Send Reset Email'
+                : 'Reset Password'}
           </button>
         </form>
 
