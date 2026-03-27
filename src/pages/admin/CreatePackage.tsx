@@ -2,22 +2,23 @@ import React, { useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { usePackages } from '../../contexts/PackageContext';
-import { 
-  MapPin, 
-  Clock, 
-  Users, 
-  IndianRupee, 
-  Image, 
-  List, 
-  Star, 
-  CheckCircle, 
+import { useLocations } from '../../contexts/LocationContext';
+import {
+  MapPin,
+  Map,
+  Clock,
+  Users,
+  IndianRupee,
+  Image,
+  List,
+  Star,
+  CheckCircle,
   XCircle,
   Plus,
   Trash2,
   Calendar,
   Hotel,
   Utensils,
-  Camera,
   Save,
   ArrowLeft
 } from 'lucide-react';
@@ -42,7 +43,10 @@ interface AccommodationDetails {
 
 interface PackageFormData {
   name: string;
+  locationId: string;
   destination: string;
+  destinationCity: string;
+  destinationCountry: string;
   description: string;
   duration: number;
   maxGuests: number;
@@ -59,7 +63,8 @@ interface PackageFormData {
 }
 
 const CreatePackage: React.FC = () => {
-  const { addPackage } = usePackages();
+  const { addPackage, packages, deletePackage } = usePackages();
+  const { locations } = useLocations();
   const { register, handleSubmit, control, watch, setValue, formState: { errors } } = useForm<PackageFormData>({
     defaultValues: {
       gallery: [''],
@@ -89,24 +94,19 @@ const CreatePackage: React.FC = () => {
   const [mainImage, setMainImage] = useState('');
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
 
-  const { fields: galleryFields, append: appendGallery, remove: removeGallery } = useFieldArray({
-    control,
-    name: 'gallery'
-  });
-
   const { fields: highlightFields, append: appendHighlight, remove: removeHighlight } = useFieldArray({
     control,
-    name: 'highlights'
+    name: 'highlights' as never
   });
 
   const { fields: includeFields, append: appendInclude, remove: removeInclude } = useFieldArray({
     control,
-    name: 'includes'
+    name: 'includes' as never
   });
 
   const { fields: excludeFields, append: appendExclude, remove: removeExclude } = useFieldArray({
     control,
-    name: 'excludes'
+    name: 'excludes' as never
   });
 
   const { fields: itineraryFields, append: appendItinerary, remove: removeItinerary } = useFieldArray({
@@ -131,8 +131,11 @@ const CreatePackage: React.FC = () => {
   }, [watchPrice, watchOriginalPrice, setValue]);
 
   const onSubmit = async (data: PackageFormData) => {
+    console.log("Form submitted"); // ✅ check trigger
+
     setIsSubmitting(true);
     try {
+
       // Process the form data to match PackageType structure
       const processedData = {
         ...data,
@@ -150,10 +153,16 @@ const CreatePackage: React.FC = () => {
           amenities: hotel.amenities[0] ? hotel.amenities[0].split('\n').filter(amenity => amenity.trim() !== '') : []
         }))
       };
-      
+      console.log("Processed data:", processedData); // ✅ check data
+
       // Add the package using context
-      const packageId = addPackage(processedData);
-      
+      const packageId = await fetch('/api/packages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(processedData),
+      });
+      console.log("Package ID:", packageId); // ✅ check return
+
       // Show success message with package ID
       alert(`Package created successfully! Package ID: ${packageId}`);
       navigate('/admin/packages');
@@ -195,11 +204,10 @@ const CreatePackage: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
-                  activeTab === tab.id
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
-                }`}
+                className={`flex items-center px-6 py-4 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${activeTab === tab.id
+                  ? 'border-primary-500 text-primary-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
               >
                 {tab.icon}
                 <span className="ml-2">{tab.label}</span>
@@ -214,7 +222,7 @@ const CreatePackage: React.FC = () => {
             {activeTab === 'basic' && (
               <div className="space-y-6">
                 <h3 className="text-lg font-semibold mb-4">Basic Package Information</h3>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="label flex items-center">
@@ -234,8 +242,24 @@ const CreatePackage: React.FC = () => {
 
                   <div>
                     <label className="label flex items-center">
+                      <Map size={16} className="mr-2 text-gray-500" />
+                      Linked Location
+                    </label>
+                    <select
+                      className="input"
+                      {...register('locationId')}
+                    >
+                      <option value="">Select a location (optional)</option>
+                      {locations.map(loc => (
+                        <option key={loc.id} value={loc.id}>{loc.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="label flex items-center">
                       <MapPin size={16} className="mr-2 text-gray-500" />
-                      Destination *
+                      Specific Destination *
                     </label>
                     <input
                       type="text"
@@ -246,6 +270,31 @@ const CreatePackage: React.FC = () => {
                     {errors.destination && (
                       <p className="text-red-500 text-sm mt-1">{errors.destination.message}</p>
                     )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="label flex items-center">
+                      City *
+                    </label>
+                    <input
+                      type="text"
+                      className="input"
+                      placeholder="e.g., Port Blair"
+                      {...register('destinationCity')}
+                    />
+                  </div>
+                  <div>
+                    <label className="label flex items-center">
+                      Country *
+                    </label>
+                    <input
+                      type="text"
+                      className="input"
+                      placeholder="e.g., India"
+                      {...register('destinationCountry')}
+                    />
                   </div>
                 </div>
 
@@ -272,7 +321,7 @@ const CreatePackage: React.FC = () => {
                       className={`input ${errors.duration ? 'border-red-500' : ''}`}
                       min="1"
                       placeholder="e.g., 5"
-                      {...register('duration', { 
+                      {...register('duration', {
                         required: 'Duration is required',
                         min: { value: 1, message: 'Duration must be at least 1 day' }
                       })}
@@ -292,7 +341,7 @@ const CreatePackage: React.FC = () => {
                       className={`input ${errors.maxGuests ? 'border-red-500' : ''}`}
                       min="1"
                       placeholder="e.g., 12"
-                      {...register('maxGuests', { 
+                      {...register('maxGuests', {
                         required: 'Maximum guests is required',
                         min: { value: 1, message: 'Must allow at least 1 guest' }
                       })}
@@ -309,7 +358,7 @@ const CreatePackage: React.FC = () => {
             {activeTab === 'pricing' && (
               <div className="space-y-6">
                 <h3 className="text-lg font-semibold mb-4">Package Pricing</h3>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
                     <label className="label flex items-center">
@@ -321,7 +370,7 @@ const CreatePackage: React.FC = () => {
                       className={`input ${errors.price ? 'border-red-500' : ''}`}
                       min="0"
                       placeholder="e.g., 25000"
-                      {...register('price', { 
+                      {...register('price', {
                         required: 'Price is required',
                         min: { value: 0, message: 'Price cannot be negative' }
                       })}
@@ -380,7 +429,7 @@ const CreatePackage: React.FC = () => {
             {activeTab === 'media' && (
               <div className="space-y-6">
                 <h3 className="text-lg font-semibold mb-4">Package Images</h3>
-                
+
                 <ImageUpload
                   label="Main Package Image"
                   onImageUpload={setMainImage}
@@ -399,7 +448,7 @@ const CreatePackage: React.FC = () => {
                   currentImages={galleryImages}
                   maxImages={10}
                 />
-                
+
                 {/* Hidden inputs for form validation */}
                 {galleryImages.map((image, index) => (
                   <input
@@ -416,7 +465,7 @@ const CreatePackage: React.FC = () => {
             {activeTab === 'features' && (
               <div className="space-y-8">
                 <h3 className="text-lg font-semibold mb-4">Package Features</h3>
-                
+
                 {/* Highlights */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
@@ -426,14 +475,14 @@ const CreatePackage: React.FC = () => {
                     </label>
                     <button
                       type="button"
-                      onClick={() => appendHighlight('')}
+                      onClick={() => appendHighlight('' as never)}
                       className="btn btn-outline py-2 px-3 text-sm flex items-center"
                     >
                       <Plus size={14} className="mr-1" />
                       Add Highlight
                     </button>
                   </div>
-                  
+
                   <div className="space-y-3">
                     {highlightFields.map((field, index) => (
                       <div key={field.id} className="flex items-center space-x-3">
@@ -466,14 +515,14 @@ const CreatePackage: React.FC = () => {
                     </label>
                     <button
                       type="button"
-                      onClick={() => appendInclude('')}
+                      onClick={() => appendInclude('' as never)}
                       className="btn btn-outline py-2 px-3 text-sm flex items-center"
                     >
                       <Plus size={14} className="mr-1" />
                       Add Inclusion
                     </button>
                   </div>
-                  
+
                   <div className="space-y-3">
                     {includeFields.map((field, index) => (
                       <div key={field.id} className="flex items-center space-x-3">
@@ -506,14 +555,14 @@ const CreatePackage: React.FC = () => {
                     </label>
                     <button
                       type="button"
-                      onClick={() => appendExclude('')}
+                      onClick={() => appendExclude('' as never)}
                       className="btn btn-outline py-2 px-3 text-sm flex items-center"
                     >
                       <Plus size={14} className="mr-1" />
                       Add Exclusion
                     </button>
                   </div>
-                  
+
                   <div className="space-y-3">
                     {excludeFields.map((field, index) => (
                       <div key={field.id} className="flex items-center space-x-3">
@@ -764,6 +813,64 @@ const CreatePackage: React.FC = () => {
             </div>
           </div>
         </form>
+      </div>
+      {/* Existing Packages List */}
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="px-6 py-4 border-b flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-800">
+            All Packages ({packages.length})
+          </h2>
+        </div>
+
+        {packages.length === 0 ? (
+          <div className="text-center py-12 text-gray-400">
+            <MapPin size={40} className="mx-auto mb-3 opacity-40" />
+            <p>No packages created yet.</p>
+          </div>
+        ) : (
+          <div className="divide-y">
+            {packages.map((pkg) => (
+              <div key={pkg.id} className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition-colors">
+                <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
+                  <img
+                    src={pkg.image}
+                    alt={pkg.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src =
+                        'https://via.placeholder.com/100?text=?';
+                    }}
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-gray-800 truncate">{pkg.name}</h3>
+                  <div className="flex flex-wrap gap-3 text-sm text-gray-500 mt-1">
+                    <span className="flex items-center gap-1">
+                      <MapPin size={13} /> {pkg.destination}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock size={13} /> {pkg.duration} days
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <IndianRupee size={13} /> ₹{pkg.price.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    if (window.confirm(`Delete "${pkg.name}"?`)) {
+                      deletePackage(pkg.id);
+                    }
+                  }}
+                  className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
+                  title="Delete"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

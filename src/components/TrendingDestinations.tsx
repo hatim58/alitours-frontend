@@ -1,92 +1,112 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TrendingUp, ArrowRight } from 'lucide-react';
-import { getTrendingDestinations } from '../utils/searchUtils';
-import { PackageType } from '../types';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useLocations } from '../contexts/LocationContext';
 
-interface TrendingDestinationsProps {
-  packages: PackageType[];
-}
-
-const TrendingDestinations: React.FC<TrendingDestinationsProps> = ({
-  packages,
-}) => {
+const TrendingDestinations: React.FC = () => {
   const navigate = useNavigate();
-  const trendingDestinations = getTrendingDestinations(packages);
+  const { locations } = useLocations();
+  const [activeTab, setActiveTab] = useState<'International' | 'Domestic'>('Domestic');
 
-  const handleExplore = (city: string, country: string) => {
-    navigate(
-      `/search?to=${encodeURIComponent(city + ', ' + country)}`
-    );
+  // For this demo, let's treat some as international, some as domestic based on arbitrary logic or just show all
+  const filteredLocations = locations.filter(loc => {
+    if (activeTab === 'Domestic') {
+      return ['ladakh', 'kashmir', 'himachal-pradesh', 'sikkim', 'shimla'].includes(loc.slug);
+    } else {
+      return ['sri-lanka', 'bhutan'].includes(loc.slug);
+    }
+  });
+
+  const displayLocations = filteredLocations.length > 0 ? filteredLocations : locations; // fallback to show something
+
+  const handleExplore = (slug: string) => {
+    navigate(`/location/${slug}`);
   };
 
   return (
-    <section className="py-12 md:py-16 bg-gradient-to-b from-gray-50 to-white">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="flex items-center gap-3 mb-8">
-          <TrendingUp className="text-blue-600" size={28} />
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-              Trending Destinations
-            </h2>
-            <p className="text-gray-600 mt-1">Most popular travel destinations</p>
+    <section className="py-16 bg-white overflow-hidden">
+      <div className="container mx-auto px-4">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row justify-between items-center mb-10">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6 md:mb-0">Trending Destinations</h2>
+          
+          <div className="flex bg-gray-100 rounded-full p-1">
+            <button
+              onClick={() => setActiveTab('International')}
+              className={`px-6 py-2 rounded-full text-sm font-semibold transition-colors ${
+                activeTab === 'International' 
+                  ? 'bg-blue-700 text-white' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              International
+            </button>
+            <button
+              onClick={() => setActiveTab('Domestic')}
+              className={`px-6 py-2 rounded-full text-sm font-semibold transition-colors ${
+                activeTab === 'Domestic' 
+                  ? 'bg-blue-700 text-white' 
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Domestic
+            </button>
           </div>
         </div>
 
-        {trendingDestinations.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500">No destinations available</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {trendingDestinations.map((dest, index) => (
-              <div
-                key={`${dest.city}-${dest.country}`}
-                className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+        {/* Carousel / List */}
+        <div className="relative">
+          {/* Navigation Buttons */}
+          <button className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 z-10 bg-white shadow-lg rounded-full p-2 text-gray-400 hover:text-blue-600 transition-colors">
+            <ChevronLeft size={24} />
+          </button>
+          
+          <button className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 z-10 bg-blue-700 text-white shadow-lg rounded-full p-2 hover:bg-blue-800 transition-colors">
+            <ChevronRight size={24} />
+          </button>
+
+          <div className="flex space-x-4 md:space-x-6 overflow-x-auto pb-8 hide-scrollbar snap-x px-4 md:px-0">
+            {displayLocations.map((loc) => (
+              <div 
+                key={loc.id}
+                onClick={() => handleExplore(loc.slug)}
+                className="flex-shrink-0 w-40 md:w-52 h-64 md:h-80 relative rounded-t-full rounded-b-full overflow-hidden cursor-pointer group shadow-sm hover:shadow-xl transition-all duration-300 snap-center"
               >
-                <img
-                  src={dest.image}
-                  alt={dest.city}
-                  className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-300"
+                <img 
+                  src={loc.image} 
+                  alt={loc.name} 
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />
-
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-between p-6">
-                  <div className="text-white">
-                    <div className="inline-block bg-blue-600 text-xs font-bold px-3 py-1 rounded-full mb-3">
-                      #{index + 1} Trending
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-2xl font-bold text-white mb-1">
-                      {dest.city}
-                    </h3>
-                    <p className="text-blue-100 text-sm mb-4">{dest.country}</p>
-
-                    <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3 mb-4">
-                      <p className="text-white text-sm">
-                        <span className="font-bold text-lg">{dest.packages}</span>{' '}
-                        amazing packages
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={() => handleExplore(dest.city, dest.country)}
-                      className="w-full bg-white text-blue-600 font-semibold py-2 rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 group/btn"
-                    >
-                      Explore
-                      <ArrowRight
-                        size={16}
-                        className="group-hover/btn:translate-x-1 transition-transform"
-                      />
-                    </button>
-                  </div>
-                </div>
+                <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-transparent to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
+                <h3 className="absolute top-8 left-0 right-0 text-center font-bold text-gray-800 text-lg md:text-xl tracking-wide font-serif px-2 drop-shadow-sm">
+                  {loc.name.toUpperCase()}
+                </h3>
               </div>
             ))}
           </div>
-        )}
+        </div>
+
+        {/* Explore Now Button */}
+        <div className="mt-10 flex justify-center">
+          <button 
+            onClick={() => navigate('/packages')} 
+            className="flex items-center space-x-2 bg-blue-700 text-white px-8 py-3 rounded-full font-medium hover:bg-blue-800 transition-colors shadow-lg hover:shadow-xl"
+          >
+            <span>Explore Now</span>
+            <ArrowRight size={18} />
+          </button>
+        </div>
       </div>
+      
+      <style>{`
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </section>
   );
 };

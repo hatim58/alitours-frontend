@@ -1,6 +1,15 @@
+export interface LocationType {
+  id: string;
+  name: string;
+  slug: string;
+  image: string;
+  description?: string;
+}
+
 export interface PackageType {
   id: string;
   name: string;
+  locationId?: string;
   destination: string;
   destinationCity: string;
   destinationCountry: string;

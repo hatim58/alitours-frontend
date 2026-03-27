@@ -1,67 +1,30 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { Loader } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredRole?: 'user' | 'admin';
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAuthorized, setIsAuthorized] = useState(false);
+  const { user, isAuthenticated } = useAuth();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        setIsLoading(true);
+  // While AuthContext is hydrating from localStorage the user will be null
+  // but isAuthenticated won't be set yet — we use a simple check here.
+  // Since AuthContext sets state synchronously from localStorage in a useEffect,
+  // we wait one tick; however the simplest reliable approach is:
+  // if no user AND no stored token → redirect to login.
+  const storedUser = localStorage.getItem('user');
 
-        const token = localStorage.getItem('token');
+  if (!isAuthenticated && !storedUser) {
+    return <Navigate to="/login" replace />;
+  }
 
-        if (!token) {
-          setIsAuthorized(false);
-          return;
-        }
-
-        const res = await fetch(`${API_BASE_URL}/auth/me`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!res.ok) {
-          setIsAuthorized(false);
-          return;
-        }
-
-        const data = await res.json();
-        const user = data.user;
-
-        if (!user || !user.is_active) {
-          setIsAuthorized(false);
-          return;
-        }
-
-        if (requiredRole && user.role !== requiredRole) {
-          setIsAuthorized(false);
-          return;
-        }
-
-        setIsAuthorized(true);
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        setIsAuthorized(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkAuth();
-  }, [requiredRole]);
-
-  if (isLoading) {
+  // If AuthContext hasn't hydrated yet (storedUser exists but user state is null)
+  // show a loader briefly
+  if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -72,8 +35,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole 
     );
   }
 
-  if (!isAuthorized) {
-    return <Navigate to="/login" replace />;
+  // Role-based check
+  if (requiredRole && user.role !== requiredRole) {
+    // Admin trying to access user route → redirect to admin
+    // User trying to access admin route → redirect to login
+    if (requiredRole === 'admin') {
+      return <Navigate to="/login" replace />;
+    }
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;

@@ -5,13 +5,11 @@ import {
   Calendar, 
   MapPin, 
   Users, 
-  Settings, 
   LogOut, 
   ChevronRight,
   Menu,
   FileText,
-  Star,
-  Image
+  Map
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import Logo from '../Logo';
@@ -35,13 +33,11 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   const navItems = [
     { icon: <LayoutDashboard size={20} />, name: 'Dashboard', path: '/admin' },
     { icon: <Calendar size={20} />, name: 'Bookings', path: '/admin/bookings' },
-    { icon: <MapPin size={20} />, name: 'Tour Packages', path: '/admin/packages' },
+    { icon: <Map size={20} />, name: 'Locations', path: '/admin/locations' },
+    { icon: <MapPin size={20} />, name: 'Packages', path: '/admin/packages/new' },
     { icon: <FileText size={20} />, name: 'Invoices', path: '/admin/invoices' },
-    { icon: <Image size={20} />, name: 'Slideshow', path: '/admin/slideshow' },
     { icon: <FileText size={20} />, name: 'Quotations', path: '/admin/quotations' },
     { icon: <Users size={20} />, name: 'Customers', path: '/admin/customers' },
-    { icon: <Star size={20} />, name: 'Reviews', path: '/admin/reviews' },
-    { icon: <Settings size={20} />, name: 'Settings', path: '/admin/settings' },
   ];
   
   const handleLogout = () => {
@@ -93,7 +89,9 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
       <nav className="flex-1 overflow-y-auto py-4 px-2">
         <ul className="space-y-1">
           {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
+            const isActive = item.path === '/admin'
+              ? location.pathname === '/admin'
+              : location.pathname.startsWith(item.path);
             
             return (
               <li key={item.path}>

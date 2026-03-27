@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronDown, LogIn, User } from 'lucide-react';
+import { Menu, X, ChevronDown, LogIn, User, Phone } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import Logo from './Logo';
 
@@ -9,9 +9,9 @@ const Navbar: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const { isAuthenticated, user, logout } = useAuth();
   const location = useLocation();
-  
+
   const toggleMenu = () => setIsOpen(!isOpen);
-  
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) {
@@ -20,68 +20,71 @@ const Navbar: React.FC = () => {
         setScrolled(false);
       }
     };
-    
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-  
+
   // Close mobile menu when navigating
   useEffect(() => {
     setIsOpen(false);
   }, [location]);
-  
+
   const navLinks = [
-    { name: 'Home', path: '/' },
+    { name: 'Destinations', path: '/locations' },
     { name: 'Tour Packages', path: '/packages' },
     { name: 'Reviews', path: '/reviews' },
-    { name: 'Book Now', path: '/booking' },
-    { name: 'Contact', path: '/contact' },
+    { name: 'Contact Us', path: '/contact' },
   ];
-  
+
   return (
-    <header 
-      className={`fixed w-full z-50 transition-all duration-300 ${
-        scrolled || isOpen || location.pathname !== '/' 
-          ? 'bg-white shadow-md py-2' 
-          : 'bg-transparent py-4'
-      }`}
+    <header
+      className={`fixed w-full z-50 transition-all duration-300 ${scrolled || isOpen || location.pathname !== '/'
+        ? 'bg-white shadow-md py-2'
+        : 'bg-transparent py-4'
+        }`}
     >
       <div className="container flex justify-between items-center">
-        <Link to="/" className="flex items-center">
-          <Logo className={scrolled || isOpen || location.pathname !== '/' ? 'text-primary-600' : 'text-white'} />
-          <span 
-            className={`ml-2 text-xl font-bold ${
-              scrolled || isOpen || location.pathname !== '/' ? 'text-primary-600' : 'text-white'
-            }`}
-          >
-            Ali Tours & Travels
-          </span>
-        </Link>
-        
+        <div className="flex items-center space-x-6">
+          <a href="tel:+917869147222" className={`flex items-center font-medium transition-colors ${scrolled || isOpen || location.pathname !== '/' ? 'text-gray-700 hover:text-primary-600' : 'text-white hover:text-gray-200'
+            }`}>
+            <Phone size={18} className="mr-1" />
+            <span>7869147222</span>
+          </a>
+
+          <Link to="/" className="flex items-center">
+            <Logo className={scrolled || isOpen || location.pathname !== '/' ? 'text-primary-600' : 'text-white'} />
+            <span
+              className={`ml-2 text-xl font-bold ${scrolled || isOpen || location.pathname !== '/' ? 'text-primary-600' : 'text-white'
+                }`}
+            >
+              Ali Tours & Travels
+            </span>
+          </Link>
+        </div>
+
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
           {navLinks.map((link) => (
             <Link
               key={link.path}
               to={link.path}
-              className={`font-medium hover:text-primary-500 transition-colors ${
-                location.pathname === link.path 
-                  ? 'text-primary-500'
-                  : scrolled || location.pathname !== '/'
-                    ? 'text-gray-700' 
-                    : 'text-white'
-              }`}
+              className={`font-medium hover:text-primary-500 transition-colors ${location.pathname === link.path
+                ? 'text-primary-500'
+                : scrolled || location.pathname !== '/'
+                  ? 'text-gray-700'
+                  : 'text-white'
+                }`}
             >
               {link.name}
             </Link>
           ))}
-          
+
           {isAuthenticated ? (
             <div className="relative group">
-              <button 
-                className={`flex items-center space-x-1 font-medium ${
-                  scrolled || location.pathname !== '/' ? 'text-gray-700' : 'text-white'
-                }`}
+              <button
+                className={`flex items-center space-x-1 font-medium ${scrolled || location.pathname !== '/' ? 'text-gray-700' : 'text-white'
+                  }`}
               >
                 <User size={18} />
                 <span>{user?.name || 'Account'}</span>
@@ -94,19 +97,10 @@ const Navbar: React.FC = () => {
                   </Link>
                 )}
                 <Link to="/dashboard" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  My Dashboard
+                  My Account
                 </Link>
-                <Link to="/dashboard" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  My Dashboard
-                </Link>
-                <Link to="/profile" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  Profile
-                </Link>
-                <Link to="/my-bookings" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                  My Bookings
-                </Link>
-                <button 
-                  onClick={logout} 
+                <button
+                  onClick={logout}
                   className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
                 >
                   Logout
@@ -116,35 +110,34 @@ const Navbar: React.FC = () => {
           ) : (
             <Link
               to="/login"
-              className={`flex items-center space-x-1 font-medium ${
-                scrolled || location.pathname !== '/' ? 'text-gray-700' : 'text-white'
-              }`}
+              className={`flex items-center space-x-1 font-medium ${scrolled || location.pathname !== '/' ? 'text-gray-700' : 'text-white'
+                }`}
             >
               <LogIn size={18} />
               <span>Login</span>
             </Link>
           )}
         </nav>
-        
+
         {/* Mobile Menu Button */}
-        <button 
-          onClick={toggleMenu} 
+        <button
+          onClick={toggleMenu}
           className="md:hidden"
         >
           {isOpen ? (
-            <X 
-              size={24} 
-              className={scrolled || location.pathname !== '/' ? 'text-gray-700' : 'text-white'} 
+            <X
+              size={24}
+              className={scrolled || location.pathname !== '/' ? 'text-gray-700' : 'text-white'}
             />
           ) : (
-            <Menu 
-              size={24} 
-              className={scrolled || location.pathname !== '/' ? 'text-gray-700' : 'text-white'} 
+            <Menu
+              size={24}
+              className={scrolled || location.pathname !== '/' ? 'text-gray-700' : 'text-white'}
             />
           )}
         </button>
       </div>
-      
+
       {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden bg-white shadow-lg">
@@ -153,16 +146,15 @@ const Navbar: React.FC = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`block font-medium ${
-                  location.pathname === link.path 
-                    ? 'text-primary-500'
-                    : 'text-gray-700'
-                }`}
+                className={`block font-medium ${location.pathname === link.path
+                  ? 'text-primary-500'
+                  : 'text-gray-700'
+                  }`}
               >
                 {link.name}
               </Link>
             ))}
-            
+
             {isAuthenticated ? (
               <div className="space-y-2 pt-2 border-t border-gray-200">
                 <p className="font-medium text-gray-700">
@@ -174,16 +166,10 @@ const Navbar: React.FC = () => {
                   </Link>
                 )}
                 <Link to="/dashboard" className="block text-gray-700">
-                  My Dashboard
+                  My Account
                 </Link>
-                <Link to="/profile" className="block text-gray-700">
-                  Profile
-                </Link>
-                <Link to="/my-bookings" className="block text-gray-700">
-                  My Bookings
-                </Link>
-                <button 
-                  onClick={logout} 
+                <button
+                  onClick={logout}
                   className="w-full text-left text-gray-700"
                 >
                   Logout

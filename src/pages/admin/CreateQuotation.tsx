@@ -1,21 +1,19 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { 
-  ArrowLeft, 
   Plus, 
   Trash2, 
   Save, 
   Send, 
   User, 
-  Phone, 
   Calendar, 
-  IndianRupee,
   FileText,
-  Calculator
+  Calculator,
+  CheckCircle,
+  Clock,
+  XCircle
 } from 'lucide-react';
 import { useQuotations } from '../../contexts/QuotationContext';
-import ImageUpload from '../../components/ImageUpload';
 
 interface QuotationItem {
   description: string;
@@ -36,12 +34,12 @@ interface QuotationFormData {
 }
 
 const CreateQuotation: React.FC = () => {
-  const navigate = useNavigate();
-  const { addQuotation } = useQuotations();
+  const { quotations, addQuotation, updateQuotationStatus } = useQuotations();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
   const [quotationData, setQuotationData] = useState<QuotationFormData | null>(null);
   const [createdQuotationId, setCreatedQuotationId] = useState<string>('');
+  const [showForm, setShowForm] = useState(false);
 
   const { register, handleSubmit, control, watch, setValue, formState: { errors } } = useForm<QuotationFormData>({
     defaultValues: {
@@ -153,26 +151,32 @@ Thank you for choosing Ali Tours & Travels! 🏝️`;
     
     window.open(whatsappURL, '_blank');
     setShowWhatsAppModal(false);
-    
-    // Navigate back to quotations list
-    navigate('/admin/quotations');
+    setShowForm(false);
   };
 
   return (
-    <div className="fade-in">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center">
-          <button
-            onClick={() => navigate('/admin/quotations')}
-            className="mr-4 p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <h1 className="text-2xl font-bold">Create New Quotation</h1>
+    <div className="fade-in space-y-8">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">Quotations</h1>
+          <p className="text-gray-500 mt-1">Create and manage customer quotations.</p>
         </div>
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+        >
+          <Plus size={16} />
+          {showForm ? 'Close Form' : 'New Quotation'}
+        </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      {/* Create Form (collapsible) */}
+      {showForm && (
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b">
+          <h2 className="text-lg font-semibold">Create New Quotation</h2>
+        </div>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="p-6">
             {/* Customer Information */}
@@ -386,7 +390,7 @@ Thank you for choosing Ali Tours & Travels! 🏝️`;
               <div className="flex gap-4">
                 <button
                   type="button"
-                  onClick={() => navigate('/admin/quotations')}
+                  onClick={() => setShowForm(false)}
                   className="btn btn-outline"
                   disabled={isSubmitting}
                 >
@@ -411,6 +415,7 @@ Thank you for choosing Ali Tours & Travels! 🏝️`;
           </div>
         </form>
       </div>
+      )} {/* end showForm */}
 
       {/* WhatsApp Send Modal */}
       {showWhatsAppModal && quotationData && (
@@ -449,7 +454,7 @@ Thank you for choosing Ali Tours & Travels! 🏝️`;
                 <button
                   onClick={() => {
                     setShowWhatsAppModal(false);
-                    navigate('/admin/quotations');
+                    setShowForm(false);
                   }}
                   className="btn btn-outline flex-1"
                 >
@@ -470,6 +475,81 @@ Thank you for choosing Ali Tours & Travels! 🏝️`;
           </div>
         </div>
       )}
+
+      {/* Quotations List */}
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b">
+          <h2 className="text-lg font-semibold text-gray-800">
+            All Quotations ({quotations.length})
+          </h2>
+        </div>
+
+        {quotations.length === 0 ? (
+          <div className="text-center py-12 text-gray-400">
+            <FileText size={40} className="mx-auto mb-3 opacity-40" />
+            <p>No quotations created yet.</p>
+          </div>
+        ) : (
+          <div className="divide-y">
+            {quotations.map((q) => (
+              <div key={q.id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-gray-800">{q.customerName}</span>
+                      <span className="text-xs text-gray-400 font-mono">#{q.id}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-3 text-sm text-gray-500">
+                      <span className="flex items-center gap-1">
+                        <Calendar size={13} />
+                        Valid: {new Date(q.validUntil).toLocaleDateString()}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        ₹{q.totalAmount.toLocaleString()}
+                      </span>
+                      <span className="text-xs text-gray-400">
+                        Created: {new Date(q.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    {/* Status Badge */}
+                    <span className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${
+                      q.status === 'accepted'
+                        ? 'bg-green-100 text-green-700'
+                        : q.status === 'rejected'
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-yellow-100 text-yellow-700'
+                    }`}>
+                      {q.status === 'accepted' ? <CheckCircle size={12} /> : q.status === 'rejected' ? <XCircle size={12} /> : <Clock size={12} />}
+                      {q.status.charAt(0).toUpperCase() + q.status.slice(1)}
+                    </span>
+
+                    {/* Status Actions */}
+                    {q.status === 'pending' && (
+                      <>
+                        <button
+                          onClick={() => updateQuotationStatus(q.id, 'accepted')}
+                          className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors"
+                        >
+                          Accept
+                        </button>
+                        <button
+                          onClick={() => updateQuotationStatus(q.id, 'rejected')}
+                          className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
