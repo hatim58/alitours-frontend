@@ -16,10 +16,11 @@ const LocationContext = createContext<LocationContextType | undefined>(undefined
 export const LocationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [locations, setLocations] = useState<LocationType[]>([]);
   const { user } = useAuth();
+  const API_URL = import.meta.env.VITE_API_URL || '';
 
   const fetchLocations = async () => {
     try {
-      const response = await fetch('/api/locations');
+      const response = await fetch(`${API_URL}/api/locations`);
       if (response.ok) {
         const data = await response.json();
         setLocations(data);
@@ -35,7 +36,7 @@ export const LocationProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   const addLocation = async (locationData: Omit<LocationType, 'id'>): Promise<string> => {
     try {
-      const response = await fetch('/api/locations', {
+      const response = await fetch(`${API_URL}/api/locations`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -58,7 +59,7 @@ export const LocationProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   const updateLocation = async (id: string, locationData: Partial<LocationType>) => {
     try {
-      const response = await fetch(`/api/locations/${id}`, {
+      const response = await fetch(`${API_URL}/api/locations/${id}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -80,7 +81,7 @@ export const LocationProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   const deleteLocation = async (id: string) => {
     try {
-      const response = await fetch(`/api/locations/${id}`, {
+      const response = await fetch(`${API_URL}/api/locations/${id}`, {
         method: 'DELETE',
         headers: { 
           'Authorization': `Bearer ${user?.token}`

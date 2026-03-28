@@ -16,10 +16,11 @@ import { useAuth } from './AuthContext';
 export const PackageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [packages, setPackages] = useState<PackageType[]>([]);
   const { user } = useAuth();
+  const API_URL = import.meta.env.VITE_API_URL || '';
 
   const fetchPackages = async () => {
     try {
-      const response = await fetch('/api/packages');
+      const response = await fetch(`${API_URL}/api/packages`);
       if (response.ok) {
         const data = await response.json();
         setPackages(data);
@@ -35,7 +36,7 @@ export const PackageProvider: React.FC<{ children: ReactNode }> = ({ children })
 
   const addPackage = async (packageData: Omit<PackageType, 'id' | 'rating' | 'reviews'>): Promise<string> => {
     try {
-      const response = await fetch('/api/packages', {
+      const response = await fetch(`${API_URL}/api/packages`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -58,7 +59,7 @@ export const PackageProvider: React.FC<{ children: ReactNode }> = ({ children })
 
   const updatePackage = async (id: string, packageData: Partial<PackageType>) => {
     try {
-      const response = await fetch(`/api/packages/${id}`, {
+      const response = await fetch(`${API_URL}/api/packages/${id}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -80,7 +81,7 @@ export const PackageProvider: React.FC<{ children: ReactNode }> = ({ children })
 
   const deletePackage = async (id: string) => {
     try {
-      const response = await fetch(`/api/packages/${id}`, {
+      const response = await fetch(`${API_URL}/api/packages/${id}`, {
         method: 'DELETE',
         headers: { 
           'Authorization': `Bearer ${user?.token}`

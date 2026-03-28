@@ -37,10 +37,11 @@ import { useAuth } from './AuthContext';
 export const QuotationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [quotations, setQuotations] = useState<Quotation[]>([]);
   const { user } = useAuth();
+  const API_URL = import.meta.env.VITE_API_URL || '';
 
   const fetchQuotations = async () => {
     try {
-      const response = await fetch('/api/quotations', {
+      const response = await fetch(`${API_URL}/api/quotations`, {
         headers: { 
           'Authorization': `Bearer ${user?.token}`
         }
@@ -77,7 +78,7 @@ export const QuotationProvider: React.FC<{ children: ReactNode }> = ({ children 
         price: quotationData.totalAmount
       };
 
-      const response = await fetch('/api/quotations', {
+      const response = await fetch(`${API_URL}/api/quotations`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
