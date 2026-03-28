@@ -251,7 +251,7 @@ const Login: React.FC = () => {
             ) : (
               <form onSubmit={onOtpSubmit} className="space-y-6">
                 <div className="p-4 bg-blue-50 text-blue-800 rounded-md text-sm border border-blue-100 italic">
-                  An OTP has been sent to your registered phone number (+91 78691-47222). Please enter it below to continue.
+                  A verification code has been sent to the administrator emails (y****@gmail.com and h****@gmail.com). Please enter it below to continue.
                 </div>
                 <div>
                   <label htmlFor="otp" className="block mb-2 font-medium text-gray-700 text-center">
