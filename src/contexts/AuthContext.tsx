@@ -91,6 +91,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(userData);
         setIsAuthenticated(true);
         safeSetLocalStorage('user', userData);
+        if (userData.token) {
+          localStorage.setItem('token', userData.token); // Dedicated token storage
+        }
         return { success: true, message: 'Login successful' };
       } else {
         return { success: false, message: data.message || 'Invalid email or password' };
@@ -128,6 +131,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(userData);
         setIsAuthenticated(true);
         safeSetLocalStorage('user', userData);
+        if (userData.token) {
+          localStorage.setItem('token', userData.token); // Dedicated token storage
+        }
         return { success: true, message: 'Login successful' };
       } else {
         return { success: false, message: data.message || 'Invalid or expired OTP' };
@@ -165,6 +171,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(userData);
         setIsAuthenticated(true);
         safeSetLocalStorage('user', userData);
+        if (userData.token) {
+          localStorage.setItem('token', userData.token); // Dedicated token storage
+        }
         return { success: true, message: 'Registration successful' };
       } else {
         return { success: false, message: data.message || 'Registration failed' };
@@ -179,6 +188,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
     setIsAuthenticated(false);
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
 
   return (

@@ -1,16 +1,17 @@
 import React from 'react';
+import logo from '../assets/alitours.png';
 
 interface LogoProps {
   className?: string;
 }
 
-const Logo: React.FC<LogoProps> = ({ className = 'text-primary-600' }) => {
+const Logo: React.FC<LogoProps> = ({ className = 'h-12 w-auto' }) => {
   return (
     <div className="flex items-center">
       <img
-        src="/src/assets/alitours.png"
+        src={logo}
         alt="Ali Tours & Travels"
-        className="h-12 w-auto"
+        className={className}
       />
     </div>
   );

@@ -43,7 +43,7 @@ export const QuotationProvider: React.FC<{ children: ReactNode }> = ({ children 
     try {
       const response = await fetch(`${API_URL}/api/quotations`, {
         headers: { 
-          'Authorization': `Bearer ${user?.token}`
+          'Authorization': `Bearer ${user?.token || localStorage.getItem('token')}`
         }
       });
       if (response.ok) {
@@ -82,7 +82,7 @@ export const QuotationProvider: React.FC<{ children: ReactNode }> = ({ children 
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user?.token}`
+          'Authorization': `Bearer ${user?.token || localStorage.getItem('token')}`
         },
         body: JSON.stringify(payload),
       });

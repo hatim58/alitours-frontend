@@ -40,7 +40,7 @@ export const PackageProvider: React.FC<{ children: ReactNode }> = ({ children })
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user?.token}`
+          'Authorization': `Bearer ${user?.token || localStorage.getItem('token')}`
         },
         body: JSON.stringify(packageData),
       });
@@ -63,7 +63,7 @@ export const PackageProvider: React.FC<{ children: ReactNode }> = ({ children })
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user?.token}`
+          'Authorization': `Bearer ${user?.token || localStorage.getItem('token')}`
         },
         body: JSON.stringify(packageData),
       });
@@ -84,7 +84,7 @@ export const PackageProvider: React.FC<{ children: ReactNode }> = ({ children })
       const response = await fetch(`${API_URL}/api/packages/${id}`, {
         method: 'DELETE',
         headers: { 
-          'Authorization': `Bearer ${user?.token}`
+          'Authorization': `Bearer ${user?.token || localStorage.getItem('token')}`
         },
       });
 
