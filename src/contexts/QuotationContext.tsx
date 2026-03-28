@@ -32,72 +32,82 @@ interface QuotationContextType {
 
 const QuotationContext = createContext<QuotationContextType | undefined>(undefined);
 
-// Sample initial data
-const initialQuotations: Quotation[] = [
-  {
-    id: 'QT001',
-    customerId: 'CUST001',
-    customerName: 'Rahul Sharma',
-    customerPhone: '+91 9876543210',
-    customerEmail: 'rahul@example.com',
-    validUntil: '2024-06-15',
-    totalAmount: 125000,
-    status: 'pending',
-    createdAt: '2024-05-20',
-    terms: `• This quotation is valid for 15 days from the date of issue
-• 50% advance payment required to confirm booking
-• Balance payment due before travel date
-• Prices are subject to availability at the time of booking
-• Cancellation charges as per our policy
-• All rates are inclusive of GST`,
-    items: [
-      { description: 'Andaman Explorer Package (5 Days)', quantity: 2, unitPrice: 25000, amount: 50000 },
-      { description: 'Flight Tickets (Delhi to Port Blair)', quantity: 2, unitPrice: 15000, amount: 30000 },
-      { description: 'Airport Transfers', quantity: 1, unitPrice: 5000, amount: 5000 },
-      { description: 'Travel Insurance', quantity: 2, unitPrice: 2000, amount: 4000 }
-    ]
-  },
-  {
-    id: 'QT002',
-    customerId: 'CUST002',
-    customerName: 'Priya Patel',
-    customerPhone: '+91 9876543211',
-    customerEmail: 'priya@example.com',
-    validUntil: '2024-06-10',
-    totalAmount: 85000,
-    status: 'accepted',
-    createdAt: '2024-05-18',
-    terms: `• This quotation is valid for 15 days from the date of issue
-• 50% advance payment required to confirm booking
-• Balance payment due before travel date
-• Prices are subject to availability at the time of booking
-• Cancellation charges as per our policy
-• All rates are inclusive of GST`,
-    items: [
-      { description: 'Havelock Island Escape (4 Days)', quantity: 2, unitPrice: 20000, amount: 40000 },
-      { description: 'Scuba Diving Package', quantity: 2, unitPrice: 8000, amount: 16000 },
-      { description: 'Hotel Upgrade to Sea View', quantity: 2, unitPrice: 5000, amount: 10000 }
-    ]
-  }
-];
+import { useAuth } from './AuthContext';
 
 export const QuotationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [quotations, setQuotations] = useState<Quotation[]>(initialQuotations);
+  const [quotations, setQuotations] = useState<Quotation[]>([]);
+  const { user } = useAuth();
 
-  const addQuotation = (quotationData: Omit<Quotation, 'id' | 'createdAt' | 'status'>): string => {
-    const newId = `QT${String(Date.now()).slice(-6)}`;
-    const newQuotation: Quotation = {
-      ...quotationData,
-      id: newId,
-      createdAt: new Date().toISOString().split('T')[0],
-      status: 'pending'
-    };
-
-    setQuotations(prev => [newQuotation, ...prev]);
-    return newId;
+  const fetchQuotations = async () => {
+    try {
+      const response = await fetch('/api/quotations', {
+        headers: { 
+          'Authorization': `Bearer ${user?.token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        // Since backend might only store clientId, price, itineraryDetails, 
+        // we might need to parse some things if we stringified them.
+        // Assuming for now the backend provides what we need.
+        setQuotations(data);
+      }
+    } catch (error) {
+      console.error('Error fetching quotations:', error);
+    }
   };
 
-  const updateQuotationStatus = (id: string, status: 'pending' | 'accepted' | 'rejected') => {
+  React.useEffect(() => {
+    if (user?.role === 'admin' && user?.token) {
+      fetchQuotations();
+    }
+  }, [user]);
+
+  const addQuotation = async (quotationData: Omit<Quotation, 'id' | 'createdAt' | 'status'>): Promise<string> => {
+    try {
+      // For now, we need to map this to the backend expected structure:
+      // { clientId, itineraryDetails, price }
+      // We might not have a clientId yet if it's a new customer. 
+      // In this app, maybe we create a client first? 
+      // For simplicity, I'll assume a dummy clientId or search for one.
+      
+      const payload = {
+        clientId: 1, // Dummy or needs logic to find/create client
+        itineraryDetails: JSON.stringify(quotationData),
+        price: quotationData.totalAmount
+      };
+
+      const response = await fetch('/api/quotations', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.token}`
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        const newQuotation = await response.json();
+        // Construct frontend Quotation object from backend response
+        const formatted: Quotation = {
+          ...quotationData,
+          id: newQuotation.id.toString(),
+          createdAt: newQuotation.createdAt,
+          status: 'pending'
+        };
+        setQuotations(prev => [formatted, ...prev]);
+        return formatted.id;
+      }
+      throw new Error('Failed to create quotation');
+    } catch (error) {
+      console.error('Error adding quotation:', error);
+      throw error;
+    }
+  };
+
+  const updateQuotationStatus = async (id: string, status: 'pending' | 'accepted' | 'rejected') => {
+    // Backend doesn't have an update status route yet, let's just update local state or add route if needed.
+    // Assuming we might add one soon:
     setQuotations(prev => 
       prev.map(quotation => 
         quotation.id === id ? { ...quotation, status } : quotation
@@ -112,7 +122,7 @@ export const QuotationProvider: React.FC<{ children: ReactNode }> = ({ children 
   return (
     <QuotationContext.Provider value={{
       quotations,
-      addQuotation,
+      addQuotation: addQuotation as any,
       updateQuotationStatus,
       getQuotationById
     }}>

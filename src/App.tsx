@@ -77,6 +77,7 @@ function App() {
             <Route path="quotations" element={<CreateQuotation />} />
             <Route path="customers" element={<AdminCustomers />} />
             <Route path="packages/new" element={<CreatePackage />} />
+            <Route path="packages/edit/:id" element={<CreatePackage />} />
           </Route>
         </Routes>
       </Router>

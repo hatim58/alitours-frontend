@@ -5,8 +5,9 @@ import { safeJsonParse, safeSetLocalStorage } from '../utils/asyncHandler';
 interface AuthContextType {
   user: UserType | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; message: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; message: string; requires2FA?: boolean; userId?: number }>;
   register: (name: string, email: string, password: string, phone?: string) => Promise<{ success: boolean; message: string }>;
+  verifyOtp: (userId: number, otp: string) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
 }
 
@@ -16,28 +17,9 @@ const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   login: async () => ({ success: false, message: 'Not implemented' }),
   register: async () => ({ success: false, message: 'Not implemented' }),
+  verifyOtp: async () => ({ success: false, message: 'Not implemented' }),
   logout: () => {},
 });
-
-// Sample user data (in a real app, this would come from a backend)
-const sampleUsers = [
-  {
-    id: '1',
-    name: 'Admin User',
-    email: 'info@alitourstravels.in',
-    password: 'Yaalimadad@53',
-    phone: '+91 9876543210',
-    role: 'admin' as const,
-  },
-  {
-    id: '2',
-    name: 'Test User',
-    email: 'user@example.com',
-    password: 'password123',
-    phone: '+91 9876543211',
-    role: 'user' as const,
-  },
-];
 
 // Customer database to track all registrations
 let customerDatabase: Array<{
@@ -54,22 +36,7 @@ let customerDatabase: Array<{
   address?: string;
   gstNumber?: string;
   notes?: string;
-}> = [
-  {
-    id: 'CUST001',
-    name: 'Test User',
-    email: 'user@example.com',
-    phone: '+91 9876543211',
-    registrationDate: '2024-01-15',
-    role: 'user',
-    totalBookings: 2,
-    totalSpent: 75000,
-    lastBooking: '2024-03-20',
-    status: 'active',
-    address: '123 Test Street, Test City, 123456',
-    notes: 'Demo customer account'
-  }
-];
+}> = [];
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserType | null>(null);
@@ -88,75 +55,123 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string) => {
-    // In a real app, this would be an API call
-    const foundUser = sampleUsers.find(
-      (u) => u.email === email && u.password === password
-    );
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (foundUser) {
-      const userData: UserType = {
-        id: foundUser.id,
-        name: foundUser.name,
-        email: foundUser.email,
-        phone: foundUser.phone,
-        role: foundUser.role,
-      };
-      
-      setUser(userData);
-      setIsAuthenticated(true);
-      safeSetLocalStorage('user', userData);
+      let data;
+      try {
+        data = await response.json();
+      } catch (err) {
+        data = { message: 'Failed to parse response from server' };
+      }
 
-      return { success: true, message: 'Login successful' };
+      if (response.ok) {
+        if (data.requires2FA) {
+          return {
+            success: true,
+            message: data.message,
+            requires2FA: true,
+            userId: data.userId
+          };
+        }
+
+        const userData: UserType = {
+          id: data._id.toString(),
+          name: data.name,
+          email: data.email,
+          role: data.role.toLowerCase() as 'user' | 'admin',
+          token: data.token
+        };
+        
+        setUser(userData);
+        setIsAuthenticated(true);
+        safeSetLocalStorage('user', userData);
+        return { success: true, message: 'Login successful' };
+      } else {
+        return { success: false, message: data.message || 'Invalid email or password' };
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      return { success: false, message: 'Server error. Please try again.' };
     }
-    
-    return { success: false, message: 'Invalid email or password' };
   };
 
-  const register = async (name: string, email: string, password: string, phone?: string, address?: string) => {
-    // Check if user already exists
-    const userExists = sampleUsers.some(u => u.email === email);
+  const verifyOtp = async (userId: number, otp: string) => {
+    try {
+      const response = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, otp }),
+      });
 
-    if (userExists) {
-      return { success: false, message: 'Email already in use' };
+      let data;
+      try {
+        data = await response.json();
+      } catch (err) {
+        data = { message: 'Failed to parse response from server' };
+      }
+
+      if (response.ok) {
+        const userData: UserType = {
+          id: data._id.toString(),
+          name: data.name,
+          email: data.email,
+          role: data.role.toLowerCase() as 'user' | 'admin',
+          token: data.token
+        };
+        
+        setUser(userData);
+        setIsAuthenticated(true);
+        safeSetLocalStorage('user', userData);
+        return { success: true, message: 'Login successful' };
+      } else {
+        return { success: false, message: data.message || 'Invalid or expired OTP' };
+      }
+    } catch (error) {
+      console.error('OTP verification error:', error);
+      return { success: false, message: 'Server error. Please try again.' };
     }
+  };
 
-    // Generate customer ID
-    const customerId = `CUST${String(customerDatabase.length + 1).padStart(3, '0')}`;
+  const register = async (name: string, email: string, password: string, phone?: string) => {
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password, phone, role: 'USER' }),
+      });
 
-    // In a real app, this would create a new user in the database
-    const newUser: UserType = {
-      id: customerId,
-      name,
-      email,
-      phone,
-      role: 'user'
-    };
+      let data;
+      try {
+        data = await response.json();
+      } catch (err) {
+        data = { message: 'Failed to parse response from server' };
+      }
 
-    // Add to our sample users (in memory only - this won't persist on page refresh in this demo)
-    sampleUsers.push({...newUser, password});
-
-    // Add to customer database for admin tracking
-    customerDatabase.push({
-      id: customerId,
-      name,
-      email,
-      phone: phone || '',
-      address: address || '',
-      registrationDate: new Date().toISOString().split('T')[0],
-      role: 'user',
-      totalBookings: 0,
-      totalSpent: 0,
-      lastBooking: null,
-      status: 'active',
-      notes: 'New customer registration'
-    });
-    
-    // Log the user in
-    setUser(newUser);
-    setIsAuthenticated(true);
-    safeSetLocalStorage('user', newUser);
-
-    return { success: true, message: 'Registration successful' };
+      if (response.ok) {
+        const userData: UserType = {
+          id: data._id.toString(),
+          name: data.name,
+          email: data.email,
+          role: data.role.toLowerCase(),
+          token: data.token
+        };
+        
+        setUser(userData);
+        setIsAuthenticated(true);
+        safeSetLocalStorage('user', userData);
+        return { success: true, message: 'Registration successful' };
+      } else {
+        return { success: false, message: data.message || 'Registration failed' };
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      return { success: false, message: 'Server error. Please try again.' };
+    }
   };
 
   const logout = () => {
@@ -167,7 +182,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated, login, register, logout }}
+      value={{ user, isAuthenticated, login, register, verifyOtp, logout }}
     >
       {children}
     </AuthContext.Provider>

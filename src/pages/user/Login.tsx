@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { Mail, Lock, LogIn, AlertCircle, Phone, Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { AlertCircle, Phone, Eye, EyeOff, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface LoginFormData {
@@ -30,8 +30,11 @@ const Login: React.FC = () => {
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const [requiresOtp, setRequiresOtp] = useState(false);
+  const [otpValue, setOtpValue] = useState('');
+  const [tempUserId, setTempUserId] = useState<number | null>(null);
 
-  const { login, register: registerUser } = useAuth();
+  const { login, register: registerUser, verifyOtp } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -56,20 +59,14 @@ const Login: React.FC = () => {
       const result = await login(data.email, data.password);
 
       if (result.success) {
-        // Determine redirect: if there's a specific 'from' path use it,
-        // otherwise route admins to /admin and users to /locations
-        if (from && from !== '/') {
-          navigate(from);
-        } else {
-          // Check role from the login result — re-read from localStorage
-          const stored = localStorage.getItem('user');
-          const userData = stored ? JSON.parse(stored) : null;
-          if (userData?.role === 'admin') {
-            navigate('/admin');
-          } else {
-            navigate('/locations');
-          }
+        if (result.requires2FA) {
+          setRequiresOtp(true);
+          setTempUserId(result.userId || null);
+          return;
         }
+
+        // Determine redirect...
+        handleRedirect();
       } else {
         setLoginError(result.message);
       }
@@ -77,6 +74,41 @@ const Login: React.FC = () => {
       setLoginError('An unexpected error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const onOtpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!tempUserId || !otpValue) return;
+
+    setIsSubmitting(true);
+    setLoginError(null);
+
+    try {
+      const result = await verifyOtp(tempUserId, otpValue);
+      if (result.success) {
+        handleRedirect();
+      } else {
+        setLoginError(result.message);
+      }
+    } catch (error) {
+      setLoginError('OTP verification failed.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRedirect = () => {
+    if (from && from !== '/') {
+      navigate(from);
+    } else {
+      const stored = localStorage.getItem('user');
+      const userData = stored ? JSON.parse(stored) : null;
+      if (userData?.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/locations');
+      }
     }
   };
 
@@ -137,82 +169,127 @@ const Login: React.FC = () => {
         <div className="flex flex-col lg:flex-row">
           {/* Login Section */}
           <div className="flex-1 p-8 border-r border-gray-200">
-            <h2 className="text-2xl font-semibold mb-6">Login to Your Account</h2>
+            <h2 className="text-2xl font-semibold mb-6">
+              {requiresOtp ? 'Two-Factor Authentication' : 'Login to Your Account'}
+            </h2>
 
-            <form onSubmit={handleSubmit(onLoginSubmit)} className="space-y-4">
-              <div>
-                <label htmlFor="login-email" className="block mb-2 font-medium text-gray-700">
-                  Email Address
-                </label>
-                <input
-                  id="login-email"
-                  type="email"
-                  className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-gray-500 ${errors.email ? 'border-red-500' : ''}`}
-                  placeholder="Enter your email"
-                  {...registerField('email', {
-                    required: 'Email is required',
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: 'Invalid email address'
-                    }
-                  })}
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-                )}
-              </div>
+            {!requiresOtp ? (
+              <form onSubmit={handleSubmit(onLoginSubmit)} className="space-y-4">
+                <div>
+                  <label htmlFor="login-email" className="block mb-2 font-medium text-gray-700">
+                    Email Address
+                  </label>
+                  <input
+                    id="login-email"
+                    type="email"
+                    className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-gray-500 ${errors.email ? 'border-red-500' : ''}`}
+                    placeholder="Enter your email"
+                    {...registerField('email', {
+                      required: 'Email is required',
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: 'Invalid email address'
+                      }
+                    })}
+                  />
+                  {errors.email && (
+                    <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                  )}
+                </div>
 
-              <div className="relative">
-                <label htmlFor="login-password" className="block mb-2 font-medium text-gray-700">
-                  Password
-                </label>
-                <input
-                  id="login-password"
-                  type={showLoginPassword ? 'text' : 'password'}
-                  className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-gray-500 pr-12 ${errors.password ? 'border-red-500' : ''}`}
-                  placeholder="Enter your password"
-                  {...registerField('password', {
-                    required: 'Password is required',
-                    minLength: {
-                      value: 6,
-                      message: 'Password must be at least 6 characters'
-                    }
-                  })}
-                />
+                <div className="relative">
+                  <label htmlFor="login-password" className="block mb-2 font-medium text-gray-700">
+                    Password
+                  </label>
+                  <input
+                    id="login-password"
+                    type={showLoginPassword ? 'text' : 'password'}
+                    className={`w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:border-gray-500 pr-12 ${errors.password ? 'border-red-500' : ''}`}
+                    placeholder="Enter your password"
+                    {...registerField('password', {
+                      required: 'Password is required',
+                      minLength: {
+                        value: 6,
+                        message: 'Password must be at least 6 characters'
+                      }
+                    })}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-4 top-11 text-gray-500 hover:text-gray-700"
+                    onClick={() => setShowLoginPassword(!showLoginPassword)}
+                  >
+                    {showLoginPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                  {errors.password && (
+                    <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+                  )}
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      className="mr-2"
+                      {...registerField('rememberMe')}
+                    />
+                    <span className="text-sm">Remember me</span>
+                  </label>
+                  <Link to="/password-reset" className="text-blue-600 hover:underline text-sm">
+                    Forgot Password?
+                  </Link>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full bg-gray-800 text-white py-3 rounded-md font-semibold hover:bg-gray-700 transition-colors"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Signing in...' : 'Login'}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={onOtpSubmit} className="space-y-6">
+                <div className="p-4 bg-blue-50 text-blue-800 rounded-md text-sm border border-blue-100 italic">
+                  An OTP has been sent to your registered phone number (+91 78691-47222). Please enter it below to continue.
+                </div>
+                <div>
+                  <label htmlFor="otp" className="block mb-2 font-medium text-gray-700 text-center">
+                    Verification Code
+                  </label>
+                  <input
+                    id="otp"
+                    type="text"
+                    maxLength={6}
+                    className="w-full px-4 py-4 text-center text-2xl tracking-[1em] font-bold border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+                    placeholder="000000"
+                    value={otpValue}
+                    onChange={(e) => setOtpValue(e.target.value.replace(/\D/g, ''))}
+                    required
+                    autoFocus
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full bg-blue-600 text-white py-3 rounded-md font-semibold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200"
+                  disabled={isSubmitting || otpValue.length !== 6}
+                >
+                  {isSubmitting ? 'Verifying...' : 'Verify & Login'}
+                </button>
+                
                 <button
                   type="button"
-                  className="absolute right-4 top-11 text-gray-500 hover:text-gray-700"
-                  onClick={() => setShowLoginPassword(!showLoginPassword)}
+                  className="w-full text-gray-500 text-sm hover:underline"
+                  onClick={() => {
+                    setRequiresOtp(false);
+                    setOtpValue('');
+                  }}
                 >
-                  {showLoginPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  Back to Login
                 </button>
-                {errors.password && (
-                  <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-                )}
-              </div>
-
-              <div className="flex justify-between items-center">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    className="mr-2"
-                    {...registerField('rememberMe')}
-                  />
-                  <span className="text-sm">Remember me</span>
-                </label>
-                <Link to="/password-reset" className="text-blue-600 hover:underline text-sm">
-                  Forgot Password?
-                </Link>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-gray-800 text-white py-3 rounded-md font-semibold hover:bg-gray-700 transition-colors"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'Signing in...' : 'Login'}
-              </button>
-            </form>
+              </form>
+            )}
 
             <div className="relative text-center my-6">
               <div className="absolute inset-0 flex items-center">

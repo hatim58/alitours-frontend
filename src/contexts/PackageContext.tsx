@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { PackageType } from '../types';
-import { packages as initialPackages } from '../data/packages';
 
 interface PackageContextType {
   packages: PackageType[];
@@ -12,32 +11,88 @@ interface PackageContextType {
 
 const PackageContext = createContext<PackageContextType | undefined>(undefined);
 
+import { useAuth } from './AuthContext';
+
 export const PackageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [packages, setPackages] = useState<PackageType[]>(initialPackages);
+  const [packages, setPackages] = useState<PackageType[]>([]);
+  const { user } = useAuth();
 
-  const addPackage = (packageData: Omit<PackageType, 'id' | 'rating' | 'reviews'>): string => {
-    const newId = `pkg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const newPackage: PackageType = {
-      ...packageData,
-      id: newId,
-      rating: 4.5, // Default rating for new packages
-      reviews: 0, // Start with 0 reviews
-    };
-
-    setPackages(prev => [newPackage, ...prev]);
-    return newId;
+  const fetchPackages = async () => {
+    try {
+      const response = await fetch('/api/packages');
+      if (response.ok) {
+        const data = await response.json();
+        setPackages(data);
+      }
+    } catch (error) {
+      console.error('Error fetching packages:', error);
+    }
   };
 
-  const updatePackage = (id: string, packageData: Partial<PackageType>) => {
-    setPackages(prev => 
-      prev.map(pkg => 
-        pkg.id === id ? { ...pkg, ...packageData } : pkg
-      )
-    );
+  React.useEffect(() => {
+    fetchPackages();
+  }, []);
+
+  const addPackage = async (packageData: Omit<PackageType, 'id' | 'rating' | 'reviews'>): Promise<string> => {
+    try {
+      const response = await fetch('/api/packages', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.token}`
+        },
+        body: JSON.stringify(packageData),
+      });
+
+      if (response.ok) {
+        const newPackage = await response.json();
+        setPackages(prev => [newPackage, ...prev]);
+        return newPackage.id;
+      }
+      throw new Error('Failed to create package');
+    } catch (error) {
+      console.error('Error adding package:', error);
+      throw error;
+    }
   };
 
-  const deletePackage = (id: string) => {
-    setPackages(prev => prev.filter(pkg => pkg.id !== id));
+  const updatePackage = async (id: string, packageData: Partial<PackageType>) => {
+    try {
+      const response = await fetch(`/api/packages/${id}`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.token}`
+        },
+        body: JSON.stringify(packageData),
+      });
+
+      if (response.ok) {
+        const updatedPackage = await response.json();
+        setPackages(prev => 
+          prev.map(pkg => pkg.id === id ? updatedPackage : pkg)
+        );
+      }
+    } catch (error) {
+      console.error('Error updating package:', error);
+    }
+  };
+
+  const deletePackage = async (id: string) => {
+    try {
+      const response = await fetch(`/api/packages/${id}`, {
+        method: 'DELETE',
+        headers: { 
+          'Authorization': `Bearer ${user?.token}`
+        },
+      });
+
+      if (response.ok) {
+        setPackages(prev => prev.filter(pkg => pkg.id !== id));
+      }
+    } catch (error) {
+      console.error('Error deleting package:', error);
+    }
   };
 
   const getPackageById = (id: string): PackageType | undefined => {
@@ -47,7 +102,7 @@ export const PackageProvider: React.FC<{ children: ReactNode }> = ({ children })
   return (
     <PackageContext.Provider value={{
       packages,
-      addPackage,
+      addPackage: addPackage as any, // Temporary cast for compatibility
       updatePackage,
       deletePackage,
       getPackageById

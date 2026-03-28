@@ -82,6 +82,7 @@ export interface UserType {
   email: string;
   phone?: string;
   role: 'user' | 'admin';
+  token?: string;
 }
 
 export interface CustomerType {

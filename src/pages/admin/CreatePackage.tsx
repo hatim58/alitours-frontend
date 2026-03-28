@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { usePackages } from '../../contexts/PackageContext';
 import { useLocations } from '../../contexts/LocationContext';
 import {
@@ -20,10 +20,9 @@ import {
   Hotel,
   Utensils,
   Save,
-  ArrowLeft
+  ArrowLeft,
+  Edit
 } from 'lucide-react';
-import ImageUpload from '../../components/ImageUpload';
-import MultiImageUpload from '../../components/MultiImageUpload';
 
 interface ItineraryDay {
   title: string;
@@ -63,9 +62,15 @@ interface PackageFormData {
 }
 
 const CreatePackage: React.FC = () => {
-  const { addPackage, packages, deletePackage } = usePackages();
+  const { addPackage, packages, updatePackage, deletePackage } = usePackages();
   const { locations } = useLocations();
-  const { register, handleSubmit, control, watch, setValue, formState: { errors } } = useForm<PackageFormData>({
+  const { id } = useParams<{ id: string }>();
+  const isEditing = !!id;
+  
+  const packageToEdit = isEditing ? packages.find((p: any) => p.id === id) : null;
+
+  const { register, handleSubmit, control, watch, setValue, trigger, formState: { errors } } = useForm<PackageFormData>({
+    mode: 'onChange',
     defaultValues: {
       gallery: [''],
       highlights: [''],
@@ -91,8 +96,54 @@ const CreatePackage: React.FC = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
-  const [mainImage, setMainImage] = useState('');
-  const [galleryImages, setGalleryImages] = useState<string[]>([]);
+
+  React.useEffect(() => {
+    if (packageToEdit) {
+      setValue('name', packageToEdit.name);
+      setValue('locationId', packageToEdit.locationId || '');
+      setValue('destination', packageToEdit.destination);
+      setValue('destinationCity', packageToEdit.destinationCity);
+      setValue('destinationCountry', packageToEdit.destinationCountry);
+      setValue('description', packageToEdit.description);
+      setValue('duration', packageToEdit.duration);
+      setValue('maxGuests', packageToEdit.maxGuests);
+      setValue('price', packageToEdit.price);
+      if (packageToEdit.originalPrice) setValue('originalPrice', packageToEdit.originalPrice);
+      if (packageToEdit.discount) setValue('discount', packageToEdit.discount);
+      
+      setValue('image', packageToEdit.image);
+      if (packageToEdit.gallery?.length) {
+        setValue('gallery', packageToEdit.gallery);
+      }
+      
+      if (packageToEdit.highlights?.length) {
+        setValue('highlights', packageToEdit.highlights);
+      }
+      if (packageToEdit.includes?.length) {
+        setValue('includes', packageToEdit.includes);
+      }
+      if (packageToEdit.excludes?.length) {
+        setValue('excludes', packageToEdit.excludes);
+      }
+      if (packageToEdit.itinerary?.length) {
+        setValue('itinerary', (packageToEdit.itinerary as any).map((day: any) => ({
+          ...day,
+          activities: day.activities ? [day.activities.join('\n')] : ['']
+        })));
+      }
+      if (packageToEdit.accommodation?.length) {
+        setValue('accommodation', (packageToEdit.accommodation as any).map((hotel: any) => ({
+          ...hotel,
+          amenities: hotel.amenities ? [hotel.amenities.join('\n')] : ['']
+        })));
+      }
+    }
+  }, [packageToEdit, setValue]);
+
+  const { fields: galleryFields, append: appendGallery, remove: removeGallery } = useFieldArray({
+    control,
+    name: 'gallery' as never
+  });
 
   const { fields: highlightFields, append: appendHighlight, remove: removeHighlight } = useFieldArray({
     control,
@@ -139,8 +190,8 @@ const CreatePackage: React.FC = () => {
       // Process the form data to match PackageType structure
       const processedData = {
         ...data,
-        image: mainImage || data.image,
-        gallery: galleryImages.length > 0 ? galleryImages : data.gallery.filter(url => url.trim() !== ''),
+        image: data.image,
+        gallery: data.gallery.filter(url => url.trim() !== ''),
         highlights: data.highlights.filter(highlight => highlight.trim() !== ''),
         includes: data.includes.filter(include => include.trim() !== ''),
         excludes: data.excludes.filter(exclude => exclude.trim() !== ''),
@@ -155,19 +206,18 @@ const CreatePackage: React.FC = () => {
       };
       console.log("Processed data:", processedData); // ✅ check data
 
-      // Add the package using context
-      const packageId = await fetch('/api/packages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(processedData),
-      });
-      console.log("Package ID:", packageId); // ✅ check return
-
-      // Show success message with package ID
-      alert(`Package created successfully! Package ID: ${packageId}`);
+      if (isEditing && id) {
+        await updatePackage(id, processedData as any);
+        alert('Package updated successfully!');
+      } else {
+        // Add the package using context
+        const pkgId = await addPackage(processedData as any);
+        console.log("Package ID:", pkgId); // ✅ check return
+        alert(`Package created successfully! Package ID: ${pkgId}`);
+      }
       navigate('/admin/packages');
     } catch (error) {
-      alert('Error creating package. Please try again.');
+      alert(`Error ${isEditing ? 'updating' : 'creating'} package. Please try again.`);
     } finally {
       setIsSubmitting(false);
     }
@@ -182,6 +232,44 @@ const CreatePackage: React.FC = () => {
     { id: 'accommodation', label: 'Hotels', icon: <Hotel size={16} /> }
   ];
 
+  const currentIndex = tabs.findIndex(t => t.id === activeTab);
+  const isFirstTab = currentIndex === 0;
+  const isLastTab = currentIndex === tabs.length - 1;
+
+  const handleNext = async () => {
+    let isValid = false;
+    switch (activeTab) {
+      case 'basic':
+        isValid = await trigger(['name', 'destination', 'destinationCity', 'destinationCountry', 'description', 'duration', 'maxGuests']);
+        break;
+      case 'pricing':
+        isValid = await trigger(['price', 'originalPrice', 'discount']);
+        break;
+      case 'media':
+        isValid = await trigger(['image']);
+        break;
+      case 'features':
+        isValid = await trigger(['highlights', 'includes', 'excludes']);
+        break;
+      case 'itinerary':
+        isValid = await trigger(['itinerary']);
+        break;
+      case 'accommodation':
+        isValid = await trigger(['accommodation']);
+        break;
+    }
+
+    if (isValid && !isLastTab) {
+      setActiveTab(tabs[currentIndex + 1].id);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (!isFirstTab) {
+      setActiveTab(tabs[currentIndex - 1].id);
+    }
+  };
+
   return (
     <div className="fade-in">
       <div className="flex items-center justify-between mb-6">
@@ -192,7 +280,7 @@ const CreatePackage: React.FC = () => {
           >
             <ArrowLeft size={20} />
           </button>
-          <h1 className="text-2xl font-bold">Create New Tour Package</h1>
+          <h1 className="text-2xl font-bold">{isEditing ? 'Edit Tour Package' : 'Create New Tour Package'}</h1>
         </div>
       </div>
 
@@ -430,34 +518,54 @@ const CreatePackage: React.FC = () => {
               <div className="space-y-6">
                 <h3 className="text-lg font-semibold mb-4">Package Images</h3>
 
-                <ImageUpload
-                  label="Main Package Image"
-                  onImageUpload={setMainImage}
-                  currentImage={mainImage}
-                  required
-                />
-                <input
-                  type="hidden"
-                  {...register('image', { required: !mainImage })}
-                  value={mainImage}
-                />
-
-                <MultiImageUpload
-                  label="Gallery Images"
-                  onImagesChange={setGalleryImages}
-                  currentImages={galleryImages}
-                  maxImages={10}
-                />
-
-                {/* Hidden inputs for form validation */}
-                {galleryImages.map((image, index) => (
+                <div>
+                  <label className="label">Main Package Image URL *</label>
                   <input
-                    key={index}
-                    type="hidden"
-                    {...register(`gallery.${index}` as const)}
-                    value={image}
+                    type="url"
+                    className={`input ${errors.image ? 'border-red-500' : ''}`}
+                    placeholder="https://example.com/image.jpg"
+                    {...register('image', { required: 'Image is required' })}
                   />
-                ))}
+                  {errors.image && (
+                    <p className="text-red-500 text-sm mt-1">{errors.image.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="label mb-0">Gallery Images (URLs)</label>
+                    <button
+                      type="button"
+                      onClick={() => appendGallery('' as never)}
+                      className="btn btn-outline py-2 px-3 text-sm flex items-center"
+                    >
+                      <Plus size={14} className="mr-1" />
+                      Add Image
+                    </button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {galleryFields.map((field, index) => (
+                      <div key={field.id} className="flex items-center space-x-3">
+                        <input
+                          type="url"
+                          className="input flex-1"
+                          placeholder="https://example.com/gallery-image.jpg"
+                          {...register(`gallery.${index}` as const)}
+                        />
+                        {galleryFields.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeGallery(index)}
+                            className="p-2 text-red-500 hover:bg-red-50 rounded"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 
@@ -639,10 +747,11 @@ const CreatePackage: React.FC = () => {
                         </div>
                         <div>
                           <label className="label">Day Image URL</label>
-                          <ImageUpload
-                            label=""
-                            onImageUpload={(imageUrl) => setValue(`itinerary.${index}.image`, imageUrl)}
-                            currentImage={watch(`itinerary.${index}.image`)}
+                          <input
+                            type="url"
+                            className="input"
+                            placeholder="https://example.com/day-image.jpg"
+                            {...register(`itinerary.${index}.image` as const)}
                           />
                         </div>
                       </div>
@@ -783,8 +892,16 @@ const CreatePackage: React.FC = () => {
           {/* Form Actions */}
           <div className="border-t border-gray-200 px-6 py-4 bg-gray-50">
             <div className="flex justify-between items-center">
-              <div className="text-sm text-gray-500">
-                Make sure all required fields are filled before saving
+              <div>
+                {!isFirstTab && (
+                  <button
+                    type="button"
+                    onClick={handlePrevious}
+                    className="btn btn-outline"
+                  >
+                    Previous Step
+                  </button>
+                )}
               </div>
               <div className="flex gap-4">
                 <button
@@ -795,20 +912,31 @@ const CreatePackage: React.FC = () => {
                 >
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  className="btn btn-primary flex items-center"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    'Creating Package...'
-                  ) : (
-                    <>
-                      <Save size={16} className="mr-2" />
-                      Create Package
-                    </>
-                  )}
-                </button>
+                
+                {!isLastTab ? (
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    className="btn btn-primary"
+                  >
+                    Next Step
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    className="btn btn-primary flex items-center"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      isEditing ? 'Updating...' : 'Creating...'
+                    ) : (
+                      <>
+                        <Save size={16} className="mr-2" />
+                        {isEditing ? 'Update Package' : 'Create Package'}
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -856,17 +984,29 @@ const CreatePackage: React.FC = () => {
                     </span>
                   </div>
                 </div>
-                <button
-                  onClick={() => {
-                    if (window.confirm(`Delete "${pkg.name}"?`)) {
-                      deletePackage(pkg.id);
-                    }
-                  }}
-                  className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
-                  title="Delete"
-                >
-                  <Trash2 size={16} />
-                </button>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <button
+                    onClick={() => {
+                      navigate(`/admin/packages/edit/${pkg.id}`);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="p-2 text-primary-500 hover:bg-primary-50 rounded-lg transition-colors"
+                    title="Edit"
+                  >
+                    <Edit size={16} />
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (window.confirm(`Delete "${pkg.name}"?`)) {
+                        deletePackage(pkg.id);
+                      }
+                    }}
+                    className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Delete"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>

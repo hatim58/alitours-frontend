@@ -9,24 +9,24 @@ interface AdminHeaderProps {
 const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
   const { user } = useAuth();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  
+
   return (
     <header className="h-16 bg-white shadow-sm flex items-center px-5 relative z-40">
       <div className="lg:hidden mr-4">
-        <button 
+        <button
           onClick={toggleSidebar}
           className="p-1 rounded-md hover:bg-gray-100"
         >
           <Menu size={24} />
         </button>
       </div>
-      
+
       <div className="flex-1 flex items-center justify-between">
         {/* Page Title */}
-        <h1 className="text-xl font-semibold">Dashboard</h1>
-        
+        {/* <h1 className="text-xl font-semibold">Dashboard</h1> */}
+
         {/* Search Bar (Desktop) */}
-        <div className="hidden md:block relative max-w-md">
+        {/* <div className="hidden md:block relative max-w-md">
           <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
             <Search size={18} />
           </div>
@@ -35,26 +35,26 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
             placeholder="Search..." 
             className="bg-gray-100 rounded-md py-2 pl-10 pr-4 w-full focus:outline-none focus:ring-2 focus:ring-primary-300 focus:bg-white" 
           />
-        </div>
-        
+        </div> */}
+
         {/* Right Actions */}
         <div className="flex items-center space-x-4">
           {/* Search Icon (Mobile) */}
-          <div className="md:hidden">
+          {/* <div className="md:hidden">
             {isSearchOpen ? (
               <div className="fixed inset-0 z-50 bg-white px-5 py-4 flex items-center">
                 <div className="relative flex-1">
                   <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                     <Search size={18} />
                   </div>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     autoFocus
-                    placeholder="Search..." 
-                    className="bg-gray-100 rounded-md py-2 pl-10 pr-4 w-full focus:outline-none focus:ring-2 focus:ring-primary-300" 
+                    placeholder="Search..."
+                    className="bg-gray-100 rounded-md py-2 pl-10 pr-4 w-full focus:outline-none focus:ring-2 focus:ring-primary-300"
                   />
                 </div>
-                <button 
+                <button
                   onClick={() => setIsSearchOpen(false)}
                   className="ml-3 p-2 rounded-full hover:bg-gray-100"
                 >
@@ -62,21 +62,21 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ toggleSidebar }) => {
                 </button>
               </div>
             ) : (
-              <button 
+              <button
                 onClick={() => setIsSearchOpen(true)}
                 className="p-2 rounded-full hover:bg-gray-100"
               >
                 <Search size={20} />
               </button>
             )}
-          </div>
-          
+          </div> */}
+
           {/* Notifications */}
-          <button className="p-2 rounded-full hover:bg-gray-100 relative">
+          {/* <button className="p-2 rounded-full hover:bg-gray-100 relative">
             <Bell size={20} />
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-          </button>
-          
+          </button> */}
+
           {/* User Profile */}
           <div className="flex items-center">
             <div className="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-medium mr-2">
