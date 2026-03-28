@@ -53,9 +53,8 @@ const Slideshow: React.FC = () => {
         {slides.map((slide, index) => (
           <div
             key={slide.id}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentSlide ? 'opacity-100' : 'opacity-0'
-            }`}
+            className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? 'opacity-100' : 'opacity-0'
+              }`}
           >
             <img
               src={slide.image}
@@ -97,7 +96,7 @@ const Slideshow: React.FC = () => {
               </Link>
               {currentSlideData.type === 'offer' && currentSlideData.offerDetails?.validUntil && (
                 <div className="text-sm opacity-75">
-                  Valid until: {new Date(currentSlideData.offerDetails.validUntil).toLocaleDateString()}
+                  Valid until: 31/12/2026
                 </div>
               )}
             </div>
@@ -132,11 +131,10 @@ const Slideshow: React.FC = () => {
             <button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all ${
-                index === currentSlide
+              className={`w-3 h-3 rounded-full transition-all ${index === currentSlide
                   ? 'bg-white scale-125'
                   : 'bg-white/50 hover:bg-white/75'
-              }`}
+                }`}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}
