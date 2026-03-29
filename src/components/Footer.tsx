@@ -17,32 +17,48 @@ const Footer: React.FC = () => {
             <p className="text-gray-400 mb-6">
               Discover the beauty of India with Ali Tours & Travels. We provide the best travel experiences with personalized service.
             </p>
-            
+
             {/* Google Reviews Button */}
             <div className="mb-6">
-              <a 
-                href="https://share.google/903hhI2NBV800BQfv" 
-                target="_blank" 
+              <a
+                href="https://share.google/903hhI2NBV800BQfv"
+                target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                className="group inline-flex items-center gap-2 px-5 py-3 
+               bg-gradient-to-r from-blue-600 to-blue-500 
+               text-white rounded-xl text-sm font-medium
+               shadow-md hover:shadow-lg 
+               hover:from-blue-500 hover:to-blue-400
+               transition-all duration-300"
               >
-                <Star size={16} className="mr-2 text-yellow-300" />
-                Read What Our Customers Say on Google
+                <Star size={16} className="text-yellow-300 group-hover:scale-110 transition-transform duration-300" />
+
+                <span>
+                  Read Reviews on <span className="font-semibold">Google</span>
+                </span>
+
+                <svg
+                  className="w-4 h-4 opacity-70 group-hover:translate-x-1 transition-transform duration-300"
+                  fill="none" stroke="currentColor" strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
               </a>
             </div>
-            
+
             <div className="flex space-x-4">
-              <a 
-                href="https://www.facebook.com/alitoursandtravels53" 
-                target="_blank" 
+              <a
+                href="https://www.facebook.com/alitoursandtravels53"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors"
               >
                 <Facebook size={24} />
               </a>
-              <a 
-                href="https://www.instagram.com/alitoursandtravels53/" 
-                target="_blank" 
+              <a
+                href="https://www.instagram.com/alitoursandtravels53/"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-white transition-colors"
               >
@@ -53,7 +69,7 @@ const Footer: React.FC = () => {
               </a>
             </div>
           </div>
-          
+
           {/* Quick Links */}
           <div>
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
@@ -95,7 +111,7 @@ const Footer: React.FC = () => {
               </li>
             </ul>
           </div>
-          
+
           {/* Popular Destinations */}
           <div>
             <h3 className="text-lg font-semibold mb-4">Top Destinations</h3>
@@ -127,7 +143,7 @@ const Footer: React.FC = () => {
               </li>
             </ul>
           </div>
-          
+
           {/* Contact Info */}
           <div>
             <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
@@ -153,9 +169,9 @@ const Footer: React.FC = () => {
             </ul>
           </div>
         </div>
-        
+
         <hr className="border-gray-800 my-8" />
-        
+
         <div className="flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm mb-4 md:mb-0">
             &copy; {new Date().getFullYear()} Ali Tours & Travels. All rights reserved.
@@ -169,7 +185,7 @@ const Footer: React.FC = () => {
             </Link>
           </div>
         </div>
-        
+
         {/* CodeHaven Designer Credit */}
         <CodeHavenCredit />
       </div>
@@ -191,10 +207,10 @@ const CodeHavenCredit: React.FC = () => {
         >
           <span className="mr-1">💻</span>
           <span>Designed by CodeHaven</span>
-          <svg 
+          <svg
             className={`ml-1 w-3 h-3 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
-            fill="none" 
-            stroke="currentColor" 
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -208,16 +224,16 @@ const CodeHavenCredit: React.FC = () => {
               <h3 className="text-white font-semibold text-lg mb-3">
                 💻 Website Developed by CodeHaven Software
               </h3>
-              
+
               <p className="text-gray-300 text-sm mb-4 leading-relaxed">
-                This website was proudly developed by <span className="text-primary-400 font-medium">CodeHaven Software</span> – a digital solutions company founded by Hatim Husain and Yusuf Patnawala. 
+                This website was proudly developed by <span className="text-primary-400 font-medium">CodeHaven Software</span> – a digital solutions company founded by Hatim Husain and Yusuf Patnawala.
                 Built on a shared passion for technology, innovation, and excellence, CodeHaven Software transforms ideas into intelligent and impactful digital products.
               </p>
-              
+
               <p className="text-gray-300 text-sm mb-4 leading-relaxed">
                 With deep expertise in custom software development, web and mobile applications, IT services, and system integration, they create scalable and user-friendly solutions tailored to the unique needs of businesses and organizations.
               </p>
-              
+
               <div className="mb-4">
                 <h4 className="text-primary-400 font-medium text-sm mb-2">Their approach focuses on:</h4>
                 <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-300">
@@ -226,11 +242,11 @@ const CodeHavenCredit: React.FC = () => {
                   <span className="bg-gray-700 px-3 py-1 rounded-full">Technical Precision</span>
                 </div>
               </div>
-              
+
               <p className="text-gray-300 text-sm mb-6 leading-relaxed">
                 They listen carefully, understand thoroughly, and build smartly — enabling clients to grow through seamless and efficient digital tools.
               </p>
-              
+
               <div className="border-t border-gray-700 pt-4">
                 <h4 className="text-primary-400 font-medium text-sm mb-3">Contact CodeHaven Software</h4>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-xs text-gray-300">
@@ -256,7 +272,7 @@ const CodeHavenCredit: React.FC = () => {
                   </div>
                 </div>
               </div>
-              
+
               <p className="text-gray-400 text-xs mt-4 italic">
                 "Driven by innovation and guided by integrity, CodeHaven Software is your trusted partner in the ever-evolving digital world."
               </p>

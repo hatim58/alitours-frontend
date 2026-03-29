@@ -105,7 +105,7 @@ const Slideshow: React.FC = () => {
       </div>
 
       {/* Navigation Arrows */}
-      {slides.length > 1 && (
+      {/* {slides.length > 1 && (
         <>
           <button
             onClick={goToPrevious}
@@ -122,7 +122,7 @@ const Slideshow: React.FC = () => {
             <ChevronRight size={24} />
           </button>
         </>
-      )}
+      )} */}
 
       {/* Slide Indicators */}
       {slides.length > 1 && (
@@ -132,8 +132,8 @@ const Slideshow: React.FC = () => {
               key={index}
               onClick={() => goToSlide(index)}
               className={`w-3 h-3 rounded-full transition-all ${index === currentSlide
-                  ? 'bg-white scale-125'
-                  : 'bg-white/50 hover:bg-white/75'
+                ? 'bg-white scale-125'
+                : 'bg-white/50 hover:bg-white/75'
                 }`}
               aria-label={`Go to slide ${index + 1}`}
             />
@@ -142,7 +142,7 @@ const Slideshow: React.FC = () => {
       )}
 
       {/* Play/Pause Button */}
-      {slides.length > 1 && (
+      {/* {slides.length > 1 && (
         <button
           onClick={togglePlayPause}
           className="absolute top-6 right-6 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-all backdrop-blur-sm"
@@ -150,14 +150,14 @@ const Slideshow: React.FC = () => {
         >
           {isPlaying ? <Pause size={20} /> : <Play size={20} />}
         </button>
-      )}
+      )} */}
 
       {/* Slide Counter */}
-      {slides.length > 1 && (
+      {/* {slides.length > 1 && (
         <div className="absolute top-6 left-6 bg-white/20 text-white px-3 py-1 rounded-full text-sm backdrop-blur-sm">
           {currentSlide + 1} / {slides.length}
         </div>
-      )}
+      )} */}
     </div>
   );
 };

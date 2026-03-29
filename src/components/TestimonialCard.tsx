@@ -38,8 +38,12 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({ testimonial }) => {
       
       <div className="text-sm text-gray-500">
         <span>Visited: {testimonial.visitDate}</span>
-        <span className="mx-2">•</span>
-        <span>{testimonial.package}</span>
+        {testimonial.package && (
+          <>
+            <span className="mx-2">•</span>
+            <span>{testimonial.package}</span>
+          </>
+        )}
       </div>
     </div>
   );

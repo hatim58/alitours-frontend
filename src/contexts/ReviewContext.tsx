@@ -16,46 +16,55 @@ const ReviewContext = createContext<ReviewContextType | undefined>(undefined);
 const initialReviews: ReviewType[] = [
   {
     id: 'REV001',
-    userId: '2',
-    userName: 'Priya Sharma',
-    userEmail: 'priya@example.com',
-    packageId: 'shimla-explorer',
-    packageName: 'Shimla Winter Wonderland',
+    userId: '1',
+    userName: 'hatim husain',
+    userEmail: 'hatim@example.com',
     rating: 5,
-    title: 'Amazing Shimla Experience!',
-    comment: 'Had an incredible time in Shimla with Ali Tours & Travels. The itinerary was perfect, hotels were comfortable, and the guide was very knowledgeable. The toy train ride was the highlight of our trip!',
+    title: 'The best travel agent!',
+    comment: 'The best travel agent I have ever met!!! Book confidently.',
     isVerified: true,
     status: 'approved',
-    createdAt: new Date('2024-04-15'),
-    updatedAt: new Date('2024-04-15')
+    createdAt: new Date('2024-03-25'),
+    updatedAt: new Date('2024-03-25')
   },
   {
     id: 'REV002',
     userId: '2',
-    userName: 'Rajesh Kumar',
-    userEmail: 'rajesh@example.com',
-    packageId: 'ladakh-adventure',
-    packageName: 'Ladakh Adventure Explorer',
+    userName: 'Tasneem Nalwala',
+    userEmail: 'tasneem@example.com',
     rating: 5,
-    title: 'Breathtaking Ladakh Journey',
-    comment: 'Ladakh was a dream come true! The landscapes were absolutely stunning. Ali Tours & Travels handled everything perfectly - from permits to accommodation. Pangong Lake was mesmerizing!',
+    title: 'Lovely experience in Manali',
+    comment: 'We had a lovely experience in Manali-Kullu & Kasol. Ali tours & travels suggested a perfect itinerary with all activities including road trip & hotel accommodations.',
     isVerified: true,
     status: 'approved',
-    createdAt: new Date('2024-04-10'),
-    updatedAt: new Date('2024-04-10')
+    createdAt: new Date('2024-01-20'),
+    updatedAt: new Date('2024-01-20')
   },
   {
     id: 'REV003',
-    userId: '2',
-    userName: 'Anita Patel',
-    userEmail: 'anita@example.com',
-    rating: 4,
-    title: 'Great Service Overall',
-    comment: 'Very professional service from Ali Tours & Travels. The team was responsive and helpful throughout our booking process. Would definitely recommend to others planning their trips.',
-    isVerified: false,
+    userId: '3',
+    userName: 'Khatu shyam Baba',
+    userEmail: 'khatu@example.com',
+    rating: 5,
+    title: 'Unforgettable Bandhavgarh tour',
+    comment: 'An unforgettable experience! Ali Tours & Travels organized our Bandhavgarh tour flawlessly. From comfortable transportation to well-planned safaris and stays, every detail was taken care of. Their team is professional, polite, and truly...',
+    isVerified: true,
     status: 'approved',
-    createdAt: new Date('2024-04-05'),
-    updatedAt: new Date('2024-04-05')
+    createdAt: new Date('2023-04-15'),
+    updatedAt: new Date('2023-04-15')
+  },
+  {
+    id: 'REV004',
+    userId: '4',
+    userName: 'Burhanuddin Santrod',
+    userEmail: 'burhan@example.com',
+    rating: 5,
+    title: 'Best service provider',
+    comment: 'Best service provider for train & flight tickets! His way of explaining and thinking from customers point of view is amazing! Everyone should must try his service once! Thanks bhai for making my journey comfortable 😊🙏🏻',
+    isVerified: true,
+    status: 'approved',
+    createdAt: new Date('2023-06-10'),
+    updatedAt: new Date('2023-06-10')
   }
 ];
 

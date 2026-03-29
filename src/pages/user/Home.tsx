@@ -45,57 +45,64 @@ const Home: React.FC = () => {
       {/* Trending Destinations */}
       <TrendingDestinations />
 
-      {/* Why Ali Tours & Travels? */}
-      <section className="py-16 bg-white overflow-hidden">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 border-b-2 border-primary-600 inline-block pb-2">
-            Why Ali Tours & Travels ?
-          </h2>
+      {/* The Unexpected Value Proposition Section (Von Restorff Effect) */}
+      <section className="py-24 bg-gray-900 text-white relative overflow-hidden">
+        {/* Abstract animated background elements */}
+        <div className="absolute top-0 left-0 w-96 h-96 bg-primary-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ animationDelay: '2s' }}></div>
 
-          <div className="relative rounded-2xl overflow-hidden shadow-2xl mt-4">
-            <img
-              src="https://images.pexels.com/photos/33041/antelope-canyon-lower-canyon-arizona.jpg"
-              alt="Why Ali Tours Background"
-              className="w-full h-[500px] object-cover"
-            />
-            {/* Dark overlay for better contrast if needed */}
-            <div className="absolute inset-0 bg-black/10"></div>
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-3xl mb-16">
+            <h2 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight leading-none">
+              Not <i className="font-serif italic text-primary-400">just another</i><br/> travel agency.
+            </h2>
+            <p className="text-xl text-gray-400">
+              We don't do cookie-cutter vacations. We design visceral experiences that you'll remember for a lifetime. Here is why we are completely different.
+            </p>
+          </div>
 
-            {/* Cards container */}
-            <div className="absolute bottom-6 left-0 right-0 px-6 overflow-x-auto hide-scrollbar">
-              <div className="flex space-x-4 w-max">
-                {/* Card 1 */}
-                <div className="w-64 bg-white rounded-xl overflow-hidden shadow-lg flex flex-col items-center p-6 flex-shrink-0">
-                  <h3 className="text-orange-500 font-bold text-lg mb-2">Trusted Advisor</h3>
-                  <p className="text-gray-600 text-sm mb-4 text-center">Trusted Since 2010, Designed for Modern Journeys.</p>
-                  {/* <div className="mt-auto h-24 bg-orange-100 w-full rounded-t-full"></div> Placeholder for illustration */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+             {/* Bento Card 1: Large */}
+             <div className="md:col-span-2 group relative bg-gray-800 rounded-3xl p-8 md:p-12 overflow-hidden transition-transform duration-500 hover:scale-[1.02] shadow-2xl">
+               <div className="absolute inset-0 bg-gradient-to-br from-primary-600 to-purple-800 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+               <div className="relative z-10">
+                 <h3 className="text-3xl font-bold mb-4 group-hover:text-white transition-colors">Radically Customized</h3>
+                 <p className="text-gray-400 group-hover:text-primary-100 text-lg max-w-md transition-colors">
+                   We obsess over your itinerary. Down to the side of the train you should sit on for the best sunset view. No two trips are ever the same.
+                 </p>
+               </div>
+               <div className="absolute bottom-0 right-0 w-64 h-64 bg-[url('https://images.pexels.com/photos/2387418/pexels-photo-2387418.jpeg')] bg-cover bg-center rounded-tl-full opacity-50 group-hover:scale-110 group-hover:opacity-100 transition-all duration-700"></div>
+             </div>
+
+             {/* Bento Card 2: Small */}
+             <div className="group relative bg-[#1c1c1c] rounded-3xl p-8 overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(99,197,223,0.3)] border border-gray-800 hover:border-primary-500/50">
+               <div className="text-primary-400 mb-6 font-serif italic text-6xl">02</div>
+               <h3 className="text-2xl font-bold mb-3">Zero Hidden Fees</h3>
+               <p className="text-gray-400">We hate surprise charges as much as you do. The price you see is the final price. Period.</p>
+             </div>
+
+             {/* Bento Card 3: Small */}
+             <div className="group relative bg-white text-gray-900 rounded-3xl p-8 overflow-hidden transition-all duration-500 hover:rotate-1 shadow-xl">
+               <h3 className="text-2xl font-bold mb-3">Local Secrets</h3>
+               <p className="text-gray-600 mb-8">We skip the tourist traps and take you to the hidden gems only the locals know about.</p>
+               <div className="inline-flex py-2 px-4 bg-gray-900 text-white rounded-full text-sm font-bold uppercase tracking-wider group-hover:bg-primary-500 transition-colors">Explore</div>
+             </div>
+
+             {/* Bento Card 4: Large */}
+             <div className="md:col-span-2 group relative bg-primary-500 rounded-3xl p-8 md:p-12 overflow-hidden transition-transform duration-500 hover:scale-[1.02] shadow-xl">
+                <div className="relative z-10 h-full flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-3xl font-bold mb-4 text-white">24/7 Concierge</h3>
+                    <p className="text-primary-100 text-lg max-w-sm">
+                      Flight delayed? Lost passport? Middle of the night in a foreign country? We are one call away, always awake, and ready to fix it.
+                    </p>
+                  </div>
+                  <div className="mt-8">
+                    <a href="tel:+917869147222" className="inline-block bg-white text-primary-600 font-bold py-3 px-8 rounded-full hover:bg-gray-100 transition-transform hover:scale-105">Call us now</a>
+                  </div>
                 </div>
-
-                {/* Card 2 */}
-                <div className="w-64 bg-orange-500 text-white rounded-xl shadow-lg p-6 flex-shrink-0 relative overflow-hidden">
-                  <h3 className="font-bold text-lg mb-2 relative z-10">Customized Holidays</h3>
-                  <p className="text-orange-100 text-sm relative z-10">Offers the ability to personalize your holidays according to your needs.</p>
-                </div>
-
-                {/* Card 3 */}
-                <div className="w-64 bg-blue-500 text-white rounded-xl shadow-lg p-6 flex-shrink-0 relative overflow-hidden">
-                  <h3 className="font-bold text-lg mb-2 relative z-10">Wide Varieties of Holidays</h3>
-                  <p className="text-blue-100 text-sm relative z-10">From adventure trips to romantic honeymoon getaways, we have your back.</p>
-                </div>
-
-                {/* Card 4 */}
-                <div className="w-64 bg-white rounded-xl overflow-hidden shadow-lg flex flex-col p-6 flex-shrink-0">
-                  <h3 className="text-blue-600 font-bold text-lg mb-2">Seamless Booking</h3>
-                  <p className="text-gray-600 text-sm mb-4">Book from a wide selection of travel plans with easy online payments.</p>
-                </div>
-
-                {/* Card 5 */}
-                <div className="w-64 bg-yellow-50 rounded-xl overflow-hidden shadow-lg p-6 flex-shrink-0">
-                  <h3 className="text-yellow-600 font-bold text-lg mb-2">Convenient Holidays</h3>
-                  <p className="text-gray-700 text-sm">All-in-one travel plans featuring accommodations, flights, activities, meals, and more.</p>
-                </div>
-              </div>
-            </div>
+                <div className="absolute -bottom-20 -right-20 w-96 h-96 border-[40px] border-white/20 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+             </div>
           </div>
         </div>
       </section>
@@ -117,7 +124,7 @@ const Home: React.FC = () => {
           </div>
 
           <div className="text-center mt-12">
-            <Link to="/reviews" className="btn bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full">
+            <Link to="/reviews" className="btn bg-primary-500 hover:bg-primary-600 text-white px-8 py-3 rounded-full">
               View All Reviews <ArrowRight size={18} className="inline ml-2" />
             </Link>
           </div>
@@ -144,7 +151,7 @@ const Home: React.FC = () => {
                 >
                   <span className="font-semibold text-gray-800">{faq.question}</span>
                   {openFaq === index ? (
-                    <ChevronUp className="text-blue-600 flex-shrink-0" size={20} />
+                    <ChevronUp className="text-primary-500 flex-shrink-0" size={20} />
                   ) : (
                     <ChevronDown className="text-gray-400 flex-shrink-0" size={20} />
                   )}

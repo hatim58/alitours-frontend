@@ -3,32 +3,38 @@ import { TestimonialType } from '../types';
 export const testimonials: TestimonialType[] = [
   {
     id: 1,
-    name: 'Rahul Sharma',
-    location: 'Delhi',
-    avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
+    name: 'hatim husain',
+    location: 'Google Review',
+    avatar: 'https://ui-avatars.com/api/?name=hatim+husain&background=63c5df&color=fff',
     rating: 5,
-    text: 'Ali Tours & Travels provided us with an unforgettable Tours Pacakges experience. The itinerary was perfectly balanced between adventure and relaxation. Our guide was knowledgeable and friendly, making our trip even more special.',
-    package: 'Andaman Explorer',
-    visitDate: 'March 2024'
+    text: 'The best travel agent I have ever met!!! Book confidently.',
+    visitDate: 'Recent'
   },
   {
     id: 2,
-    name: 'Priya Patel',
-    location: 'Mumbai',
-    avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg',
+    name: 'Tasneem Nalwala',
+    location: 'Google Review',
+    avatar: 'https://ui-avatars.com/api/?name=Tasneem+Nalwala&background=63c5df&color=fff',
     rating: 5,
-    text: 'We chose the Havelock Island Escape package for our honeymoon, and it exceeded all expectations. The beachfront resort was stunning, and the snorkeling experience at Elephant Beach was magical. Thank you for the perfect start to our married life!',
-    package: 'Havelock Island Escape',
-    visitDate: 'February 2024'
+    text: 'We had a lovely experience in Manali-Kullu & Kasol. Ali tours & travels suggested a perfect itinerary with all activities including road trip & hotel accommodations.',
+    visitDate: '2 months ago'
   },
   {
     id: 3,
-    name: 'Amit Verma',
-    location: 'Bangalore',
-    avatar: 'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg',
-    rating: 4,
-    text: 'Our family trip to Andaman was well-organized by Ali Tours & Travels. The kids especially loved the glass-bottom boat ride and the beaches. The only reason for 4 stars instead of 5 is that one of our ferries was delayed, but the team handled it professionally.',
-    package: 'Andaman Explorer',
-    visitDate: 'January 2024'
+    name: 'Khatu shyam Baba',
+    location: 'Google Review',
+    avatar: 'https://ui-avatars.com/api/?name=Khatu+shyam+Baba&background=63c5df&color=fff',
+    rating: 5,
+    text: 'An unforgettable experience! Ali Tours & Travels organized our Bandhavgarh tour flawlessly. From comfortable transportation to well-planned safaris and stays, every detail was taken care of. Their team is professional, polite, and truly...',
+    visitDate: '11 months ago'
+  },
+  {
+    id: 4,
+    name: 'Burhanuddin Santrod',
+    location: 'Google Review',
+    avatar: 'https://ui-avatars.com/api/?name=Burhanuddin+Santrod&background=63c5df&color=fff',
+    rating: 5,
+    text: 'Best service provider for train & flight tickets! His way of explaining and thinking from customers point of view is amazing! Everyone should must try his service once! Thanks bhai for making my journey comfortable 😊🙏🏻',
+    visitDate: '9 months ago'
   }
 ];

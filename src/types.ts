@@ -56,7 +56,7 @@ export interface TestimonialType {
   avatar: string;
   rating: number;
   text: string;
-  package: string;
+  package?: string;
   visitDate: string;
 }
 

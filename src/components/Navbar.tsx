@@ -46,11 +46,7 @@ const Navbar: React.FC = () => {
     >
       <div className="container flex justify-between items-center">
         <div className="flex items-center space-x-6">
-          <a href="tel:+917869147222" className={`flex items-center font-medium transition-colors ${scrolled || isOpen || location.pathname !== '/' ? 'text-gray-700 hover:text-primary-600' : 'text-white hover:text-gray-200'
-            }`}>
-            <Phone size={18} className="mr-1" />
-            <span>7869147222</span>
-          </a>
+
 
           <Link to="/" className="flex items-center">
             <Logo className={scrolled || isOpen || location.pathname !== '/' ? 'text-primary-600' : 'text-white'} />
@@ -79,6 +75,11 @@ const Navbar: React.FC = () => {
               {link.name}
             </Link>
           ))}
+
+          <a href="tel:+917869147222" className={`hidden lg:flex items-center font-medium transition-colors ${scrolled || location.pathname !== '/' ? 'text-gray-700 hover:text-primary-500' : 'text-white hover:text-gray-200'}`}>
+            <Phone size={18} className="mr-1" />
+            <span>+91 7869147222</span>
+          </a>
 
           {isAuthenticated ? (
             <div className="relative group">

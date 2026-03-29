@@ -12,16 +12,21 @@ interface SlideshowContextType {
 
 const SlideshowContext = createContext<SlideshowContextType | undefined>(undefined);
 
-// Sample initial slides
+import kashmirImg from '../assets/kashmir.jpg';
+import ladakhImg from '../assets/ladakh.jpg';
+import finlandImg from '../assets/finland.jpg';
+import turkeyImg from '../assets/turkey.jpg';
+import andamanImg from '../assets/andaman.jpg';
+
 const initialSlides: SlideType[] = [
   {
     id: 'slide-1',
-    title: 'Discover Paradise in Andaman',
-    subtitle: 'Exclusive Island Adventures',
-    description: 'Experience pristine beaches, crystal clear waters, and unforgettable memories with our specially curated Andaman tour packages.',
-    image: 'https://images.pexels.com/photos/1174732/pexels-photo-1174732.jpeg',
-    buttonText: 'Explore Packages',
-    buttonLink: '/packages',
+    title: 'Heaven on Earth: Kashmir',
+    subtitle: 'Paradise Found',
+    description: 'Breathtaking landscapes, serene Dal Lake, and the majestic Himalayas await you in the valley of Kashmir.',
+    image: kashmirImg,
+    buttonText: 'Explore Kashmir',
+    buttonLink: '/packages/kashmir-paradise',
     isActive: true,
     order: 1,
     type: 'package',
@@ -30,36 +35,59 @@ const initialSlides: SlideType[] = [
   },
   {
     id: 'slide-2',
-    title: 'Limited Time Offer',
-    subtitle: 'Save Up to 30% on All Packages',
-    description: 'Book your dream vacation now and save big! Special discount on all Andaman tour packages. Limited time offer.',
-    image: 'https://images.pexels.com/photos/2098427/pexels-photo-2098427.jpeg',
-    buttonText: 'Book Now',
-    buttonLink: '/booking',
+    title: 'Adventure in Ladakh',
+    subtitle: 'The Land of High Passes',
+    description: 'Conquer the highest motorable roads and find inner peace in the ancient monasteries of Ladakh.',
+    image: ladakhImg,
+    buttonText: 'View Ladakh Trips',
+    buttonLink: '/packages/ladakh-adventure',
     isActive: true,
     order: 2,
-    type: 'offer',
-    offerDetails: {
-      discountPercentage: 30,
-      validUntil: '2024-12-31'
-    },
+    type: 'package',
     createdAt: new Date('2024-01-20'),
     updatedAt: new Date('2024-01-20')
   },
   {
     id: 'slide-3',
-    title: 'Havelock Island Special',
-    subtitle: 'Beach Paradise Awaits',
-    description: 'Dive into the beauty of Havelock Island with our exclusive packages featuring water sports, beach resorts, and island hopping.',
-    image: 'https://images.pexels.com/photos/5528991/pexels-photo-5528991.jpeg',
-    buttonText: 'View Details',
-    buttonLink: '/packages/havelock-escape',
+    title: 'Northern Lights in Finland',
+    subtitle: 'Arctic Magic',
+    description: 'Experience the magical Aurora Borealis and the winter wonderland of Finland like never before.',
+    image: finlandImg,
+    buttonText: 'Winter Packages',
+    buttonLink: '/packages',
     isActive: true,
     order: 3,
     type: 'package',
-    packageId: 'havelock-escape',
     createdAt: new Date('2024-01-25'),
     updatedAt: new Date('2024-01-25')
+  },
+  {
+    id: 'slide-4',
+    title: 'Magnificent Turkey',
+    subtitle: 'Where East Meets West',
+    description: 'Explore the historical wonders, vibrant bazaars, and stunning coastlines of beautiful Turkey.',
+    image: turkeyImg,
+    buttonText: 'Discover Turkey',
+    buttonLink: '/packages',
+    isActive: true,
+    order: 4,
+    type: 'package',
+    createdAt: new Date('2024-01-30'),
+    updatedAt: new Date('2024-01-30')
+  },
+  {
+    id: 'slide-5',
+    title: 'Tropical Andaman',
+    subtitle: 'Island Paradise',
+    description: 'Dive into turquoise waters and relax on the white sandy beaches of the Andaman Islands.',
+    image: andamanImg,
+    buttonText: 'Explore Andaman',
+    buttonLink: '/packages/andaman-explorer',
+    isActive: true,
+    order: 5,
+    type: 'package',
+    createdAt: new Date('2024-02-05'),
+    updatedAt: new Date('2024-02-05')
   }
 ];
 
