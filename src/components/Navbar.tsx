@@ -58,7 +58,7 @@ const Navbar: React.FC = () => {
               className={`ml-2 text-xl font-bold ${scrolled || isOpen || location.pathname !== '/' ? 'text-primary-600' : 'text-white'
                 }`}
             >
-              Ali Tours & Travels
+              Tours & Travels
             </span>
           </Link>
         </div>

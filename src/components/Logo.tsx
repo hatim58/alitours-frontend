@@ -11,7 +11,7 @@ const Logo: React.FC<LogoProps> = ({ className = '' }) => {
       <img
         src={logo}
         alt="Ali Tours & Travels"
-        className={`h-8 w-auto object-contain max-h-full ${className}`}
+        className={`h-12 w-auto object-contain max-h-full ${className}`}
       />
     </div>
   );
