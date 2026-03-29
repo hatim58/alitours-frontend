@@ -7,10 +7,10 @@ const AdminPackages: React.FC = () => {
   const { packages, deletePackage } = usePackages();
   const [searchTerm, setSearchTerm] = useState('');
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState<string | null>(null);
-  
+
   // Filter packages based on search term
-  const filteredPackages = packages.filter(pkg => 
-    pkg.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+  const filteredPackages = packages.filter(pkg =>
+    pkg.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     pkg.destination.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -28,7 +28,7 @@ const AdminPackages: React.FC = () => {
           Add New Package
         </Link>
       </div>
-      
+
       {/* Filters */}
       <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
         <div className="flex flex-col sm:flex-row items-center gap-4">
@@ -43,7 +43,7 @@ const AdminPackages: React.FC = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          
+
           {/* Filter Dropdown */}
           <button className="flex items-center px-4 py-2 border border-gray-300 rounded-md">
             <Filter size={16} className="mr-2" />
@@ -51,7 +51,7 @@ const AdminPackages: React.FC = () => {
           </button>
         </div>
       </div>
-      
+
       {/* Packages Table */}
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
@@ -84,10 +84,10 @@ const AdminPackages: React.FC = () => {
                   <tr className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <img 
-                          src={pkg.image} 
-                          alt={pkg.name} 
-                          className="h-10 w-10 rounded-md object-cover mr-3" 
+                        <img
+                          src={pkg.image}
+                          alt={pkg.name}
+                          className="h-10 w-10 rounded-md object-cover mr-3"
                         />
                         <div className="font-medium text-gray-900 max-w-[200px] truncate">
                           {pkg.name}
@@ -113,31 +113,36 @@ const AdminPackages: React.FC = () => {
                         Active
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <Link 
-                        to={`/packages/${pkg.id}`} 
-                        className="text-blue-600 hover:text-blue-800 mr-3" 
-                        title="View Package"
-                      >
-                        <Eye size={18} />
-                      </Link>
-                      <Link 
-                        to={`/admin/packages/edit/${pkg.id}`} 
-                        className="text-yellow-600 hover:text-yellow-800 mr-3" 
-                        title="Edit Package"
-                      >
-                        <Edit size={18} />
-                      </Link>
-                      <button 
-                        className="text-red-600 hover:text-red-800" 
-                        title="Delete Package"
-                        onClick={() => setDeleteConfirmOpen(pkg.id)}
-                      >
-                        <Trash size={18} />
-                      </button>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <div className="flex items-center justify-end gap-3">
+                        <Link
+                          to={`/packages/${pkg.id}`}
+                          className="p-2 rounded-md text-blue-600 hover:bg-blue-50 hover:text-blue-700 transition"
+                          title="View Package"
+                        >
+                          <Eye size={18} />
+                        </Link>
+
+                        <Link
+                          to={`/admin/packages/edit/${pkg.id}`}
+                          className="p-2 rounded-md text-yellow-600 hover:bg-yellow-50 hover:text-yellow-700 transition"
+                          title="Edit Package"
+                        >
+                          <Edit size={18} />
+                        </Link>
+
+                        <button
+                          className="p-2 rounded-md text-red-600 hover:bg-red-50 hover:text-red-700 transition"
+                          title="Delete Package"
+                          onClick={() => setDeleteConfirmOpen(pkg.id)}
+                        >
+                          <Trash size={18} />
+                        </button>
+
+                      </div>
                     </td>
                   </tr>
-                  
+
                   {/* Delete Confirmation Row */}
                   {deleteConfirmOpen === pkg.id && (
                     <tr className="bg-red-50">
@@ -152,13 +157,13 @@ const AdminPackages: React.FC = () => {
                             </p>
                           </div>
                           <div className="flex space-x-3">
-                            <button 
+                            <button
                               className="px-3 py-1 bg-white border border-gray-300 rounded-md text-sm"
                               onClick={() => setDeleteConfirmOpen(null)}
                             >
                               Cancel
                             </button>
-                            <button 
+                            <button
                               className="px-3 py-1 bg-red-600 text-white rounded-md text-sm"
                               onClick={() => handleDeletePackage(pkg.id)}
                             >
@@ -171,7 +176,7 @@ const AdminPackages: React.FC = () => {
                   )}
                 </React.Fragment>
               ))}
-              
+
               {filteredPackages.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-6 py-10 text-center text-gray-500">

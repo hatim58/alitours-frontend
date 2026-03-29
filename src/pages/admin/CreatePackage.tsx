@@ -66,7 +66,7 @@ const CreatePackage: React.FC = () => {
   const { locations } = useLocations();
   const { id } = useParams<{ id: string }>();
   const isEditing = !!id;
-  
+
   const packageToEdit = isEditing ? packages.find((p: any) => p.id === id) : null;
 
   const { register, handleSubmit, control, watch, setValue, trigger, formState: { errors } } = useForm<PackageFormData>({
@@ -110,12 +110,12 @@ const CreatePackage: React.FC = () => {
       setValue('price', packageToEdit.price);
       if (packageToEdit.originalPrice) setValue('originalPrice', packageToEdit.originalPrice);
       if (packageToEdit.discount) setValue('discount', packageToEdit.discount);
-      
+
       setValue('image', packageToEdit.image);
       if (packageToEdit.gallery?.length) {
         setValue('gallery', packageToEdit.gallery);
       }
-      
+
       if (packageToEdit.highlights?.length) {
         setValue('highlights', packageToEdit.highlights);
       }
@@ -213,7 +213,7 @@ const CreatePackage: React.FC = () => {
         // Add the package using context
         const pkgId = await addPackage(processedData as any);
         console.log("Package ID:", pkgId); // ✅ check return
-        alert(`Package created successfully! Package ID: ${pkgId}`);
+        // alert(`Package created successfully! Package ID: ${pkgId}`);
       }
       navigate('/admin/packages');
     } catch (error) {
@@ -912,7 +912,7 @@ const CreatePackage: React.FC = () => {
                 >
                   Cancel
                 </button>
-                
+
                 {!isLastTab ? (
                   <button
                     type="button"
