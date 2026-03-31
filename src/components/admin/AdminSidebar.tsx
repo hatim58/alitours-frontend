@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Calendar, 
-  MapPin, 
-  Users, 
-  LogOut, 
+import {
+  LayoutDashboard,
+  Calendar,
+  MapPin,
+  Users,
+  LogOut,
   ChevronRight,
   Menu,
   FileText,
@@ -21,15 +21,15 @@ interface AdminSidebarProps {
   onToggle: () => void;
 }
 
-const AdminSidebar: React.FC<AdminSidebarProps> = ({ 
-  isExpanded, 
-  onMouseEnter, 
-  onMouseLeave, 
-  onToggle 
+const AdminSidebar: React.FC<AdminSidebarProps> = ({
+  isExpanded,
+  onMouseEnter,
+  onMouseLeave,
+  onToggle
 }) => {
   const location = useLocation();
   const { user, logout } = useAuth();
-  
+
   const navItems = [
     { icon: <LayoutDashboard size={20} />, name: 'Dashboard', path: '/admin' },
     { icon: <Calendar size={20} />, name: 'Bookings', path: '/admin/bookings' },
@@ -37,19 +37,19 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
     { icon: <MapPin size={20} />, name: 'Packages', path: '/admin/packages/new' },
     { icon: <FileText size={20} />, name: 'Invoices', path: '/admin/invoices' },
     { icon: <FileText size={20} />, name: 'Quotations', path: '/admin/quotations' },
+    { icon: <MapPin size={20} />, name: 'Slideshow', path: '/admin/slideshow' },
     { icon: <Users size={20} />, name: 'Customers', path: '/admin/customers' },
   ];
-  
+
   const handleLogout = () => {
     logout();
     // User will be redirected via AdminLayout useEffect
   };
-  
+
   return (
-    <div 
-      className={`bg-white h-screen shadow-lg flex flex-col fixed left-0 top-0 z-50 transition-all duration-300 ${
-        isExpanded ? 'w-64' : 'w-16'
-      }`}
+    <div
+      className={`bg-white h-screen shadow-lg flex flex-col fixed left-0 top-0 z-50 transition-all duration-300 ${isExpanded ? 'w-64' : 'w-16'
+        }`}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
@@ -61,7 +61,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
         >
           <Menu size={20} />
         </button>
-        
+
         {isExpanded ? (
           <Link to="/" className="flex items-center ml-2">
             <Logo />
@@ -75,7 +75,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
           </div>
         )}
       </div>
-      
+
       {/* Admin Info */}
       {isExpanded && (
         <div className="p-4 border-b">
@@ -84,7 +84,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
           <div className="text-sm text-primary-600">Administrator</div>
         </div>
       )}
-      
+
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-4 px-2">
         <ul className="space-y-1">
@@ -92,22 +92,21 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
             const isActive = item.path === '/admin'
               ? location.pathname === '/admin'
               : location.pathname.startsWith(item.path);
-            
+
             return (
               <li key={item.path}>
                 <Link
                   to={item.path}
-                  className={`flex items-center p-3 rounded-lg transition-colors group relative ${
-                    isActive 
-                      ? 'bg-primary-50 text-primary-600' 
+                  className={`flex items-center p-3 rounded-lg transition-colors group relative ${isActive
+                      ? 'bg-primary-50 text-primary-600'
                       : 'text-gray-700 hover:bg-gray-50 hover:text-primary-600'
-                  }`}
+                    }`}
                   title={!isExpanded ? item.name : undefined}
                 >
                   <div className={`${isActive ? 'text-primary-600' : 'text-gray-500 group-hover:text-primary-600'}`}>
                     {item.icon}
                   </div>
-                  
+
                   {isExpanded ? (
                     <>
                       <span className="ml-3 whitespace-nowrap">{item.name}</span>
@@ -125,7 +124,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
           })}
         </ul>
       </nav>
-      
+
       {/* User Profile (collapsed state) */}
       {!isExpanded && (
         <div className="p-2 border-t">
@@ -134,14 +133,13 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
           </div>
         </div>
       )}
-      
+
       {/* Logout */}
       <div className="p-2 border-t">
-        <button 
+        <button
           onClick={handleLogout}
-          className={`flex items-center text-gray-700 hover:text-red-600 w-full p-3 rounded-lg hover:bg-red-50 transition-colors group relative ${
-            !isExpanded ? 'justify-center' : ''
-          }`}
+          className={`flex items-center text-gray-700 hover:text-red-600 w-full p-3 rounded-lg hover:bg-red-50 transition-colors group relative ${!isExpanded ? 'justify-center' : ''
+            }`}
           title={!isExpanded ? 'Logout' : undefined}
         >
           <LogOut size={20} />

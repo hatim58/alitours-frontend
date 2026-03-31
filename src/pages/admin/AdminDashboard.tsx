@@ -93,7 +93,10 @@ const AdminDashboard: React.FC = () => {
           <Link to="/admin/packages/new" className="btn btn-primary">
             Add New Package
           </Link>
-          <Link to="/admin/bookings" className="btn btn-outline">
+          <Link to="/admin/slideshow" className="btn btn-outline">
+            Manage Slideshow
+          </Link>
+          <Link to="/admin/bookings" className="btn btn-primary">
             View Bookings
           </Link>
         </div>

@@ -15,6 +15,7 @@ import PackageDetails from './pages/user/PackageDetails';
 // import LocationDetails from './pages/user/LocationDetails';
 import Contact from './pages/user/Contact';
 import Login from './pages/user/Login';
+import Register from './pages/user/Register';
 import Locations from './pages/user/Locations';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminBookings from './pages/admin/Bookings';
@@ -24,6 +25,7 @@ import CreatePackage from './pages/admin/CreatePackage';
 import CreateLocation from './pages/admin/CreateLocation';
 import CreateQuotation from './pages/admin/CreateQuotation';
 import AdminInvoices from './pages/admin/Invoices';
+import AdminSlideshow from './pages/admin/SlideshowManager';
 import UserAccount from './pages/user/UserAccount';
 import PrivacyPolicy from './pages/user/PrivacyPolicy';
 import TermsOfService from './pages/user/TermsOfService';
@@ -46,6 +48,7 @@ function App() {
             <Route path="search" element={<SearchResults />} />
             <Route path="contact" element={<Contact />} />
             <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
             <Route
               path="dashboard"
               element={
@@ -76,6 +79,7 @@ function App() {
             <Route path="invoices" element={<AdminInvoices />} />
             <Route path="quotations" element={<CreateQuotation />} />
             <Route path="customers" element={<AdminCustomers />} />
+            <Route path="slideshow" element={<AdminSlideshow />} />
             <Route path="packages/new" element={<CreatePackage />} />
             <Route path="packages/edit/:id" element={<CreatePackage />} />
           </Route>

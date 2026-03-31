@@ -108,9 +108,9 @@ export const SlideshowProvider: React.FC<{ children: ReactNode }> = ({ children 
   };
 
   const updateSlide = (id: string, slideData: Partial<SlideType>) => {
-    setSlides(prev => 
-      prev.map(slide => 
-        slide.id === id 
+    setSlides(prev =>
+      prev.map(slide =>
+        slide.id === id
           ? { ...slide, ...slideData, updatedAt: new Date() }
           : slide
       )
